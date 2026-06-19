@@ -28,6 +28,7 @@ export default defineConfig([
     splitting: false,
     sourcemap: false,
     outDir: 'dist',
+    banner: { js: "'use client'" },
     external: [
       'payload',
       'react',

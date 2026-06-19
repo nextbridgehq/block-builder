@@ -1,6 +1,6 @@
 {
   "name": "@nextbridgehq/payload-block-builder",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Block Builder for Payload CMS",
   "keywords": ["payload", "payload-plugin", "cms", "block-builder", "dynamic-blocks"],
   "homepage": "https://github.com/nextbridgehq/block-builder",
