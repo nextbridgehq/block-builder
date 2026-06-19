@@ -6,7 +6,7 @@
   "homepage": "https://github.com/nextbridgehq/block-builder",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nextbridgehq/block-builder.git"
+    "url": "git+https://github.com/nextbridgehq/block-builder.git"
   },
   "author": {
     "name": "NEXTBRIDGE LIMITED",
