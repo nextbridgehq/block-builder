@@ -8,6 +8,10 @@
     "type": "git",
     "url": "https://github.com/nextbridgehq/block-builder.git"
   },
+  "author": {
+    "name": "NEXTBRIDGE LIMITED",
+    "url": "https://github.com/nextbridgehq"
+  },
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
