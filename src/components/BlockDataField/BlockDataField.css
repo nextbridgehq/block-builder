@@ -1,0 +1,393 @@
+﻿/* â”€â”€ Block Data Field â€” Payload-native styles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
+/* Container â€” mirrors Payload's group/array field outer wrapper */
+.bdf-wrap {
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: 4px;
+  overflow: hidden;
+  /* Space between this component and the next native Payload field below */
+  margin-bottom: calc(var(--base, 16px) * 0.5);
+}
+
+/* Header bar â€” like Payload's array-field header */
+.bdf-heading {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  background: var(--theme-elevation-50);
+  border-bottom: 1px solid var(--theme-elevation-150);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--theme-elevation-600);
+  font-family: var(--font-body);
+  user-select: none;
+}
+
+/* Body */
+.bdf-body {
+  background: var(--theme-elevation-0);
+  padding: var(--base, 16px);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--base, 16px) * 0.75);
+}
+
+/* Per-field wrapper */
+.bdf-field {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Label â€” exact Payload .field-label */
+.bdf-label {
+  display: flex;
+  align-items: center;
+  padding-bottom: 5px;
+  color: var(--theme-elevation-800);
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 400;
+}
+
+.bdf-required {
+  color: var(--theme-error-500, #ef4444);
+  margin-left: 3px;
+}
+
+/* Input â€” exact .sbf-input mirror */
+.bdf-input {
+  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
+  font-family: var(--font-body);
+  width: 100%;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--style-radius-s, 4px);
+  background: var(--theme-input-bg, var(--theme-elevation-0));
+  color: var(--theme-elevation-800);
+  font-size: 1rem;
+  height: 40px;
+  line-height: 20px;
+  padding: 8px 15px;
+  -webkit-appearance: none;
+  transition-property: border, box-shadow, background-color;
+  transition-duration: 0.1s, 0.1s, 0.5s;
+  transition-timing-function: cubic-bezier(0, 0.2, 0.2, 1);
+  box-sizing: border-box;
+}
+.bdf-input:hover:not(:disabled) {
+  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.2);
+  border-color: var(--theme-elevation-250);
+}
+.bdf-input:focus {
+  border-color: var(--theme-elevation-400);
+  outline: 0;
+}
+.bdf-input::placeholder {
+  color: var(--theme-elevation-400);
+  font-size: 1rem;
+}
+
+/* Textarea extends input, auto height */
+.bdf-textarea {
+  height: auto;
+  min-height: 80px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+/* Select with caret */
+.bdf-select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+
+/* Monospace (JSON) */
+.bdf-mono {
+  font-family: var(--font-mono, 'Courier New', monospace);
+  font-size: 0.875rem;
+}
+
+/* Checkbox row */
+.bdf-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 4px 0;
+}
+.bdf-checkbox-row input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: var(--theme-success-500, #22c55e);
+  border: 1px solid var(--theme-elevation-300);
+  border-radius: 2px;
+}
+.bdf-checkbox-label {
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--theme-elevation-800);
+  font-family: var(--font-body);
+}
+
+/* Multiselect / array / group fieldset */
+.bdf-fieldset {
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+.bdf-fieldset__header {
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  background: var(--theme-elevation-50);
+  border-bottom: 1px solid var(--theme-elevation-100);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--theme-elevation-800);
+  font-family: var(--font-body);
+  line-height: 20px;
+}
+.bdf-fieldset__body {
+  padding: 12px;
+  background: var(--theme-elevation-0);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--base, 16px) * 0.75);
+}
+
+/* Multiselect option */
+.bdf-multiselect-opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 3px 0;
+  font-size: 13px;
+  color: var(--theme-elevation-800);
+  font-family: var(--font-body);
+}
+.bdf-multiselect-opt input[type='checkbox'] {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  accent-color: var(--theme-success-500, #22c55e);
+  cursor: pointer;
+}
+
+/* Array row */
+.bdf-array-row {
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: 4px;
+  padding: 12px;
+  background: var(--theme-elevation-0);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--base, 16px) * 0.75);
+}
+
+/* Remove row button */
+.bdf-remove-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0;
+  font-size: 12px;
+  color: var(--theme-error-500, #ef4444);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  line-height: 20px;
+  opacity: 0.8;
+  transition: opacity 0.1s;
+}
+.bdf-remove-btn:hover {
+  opacity: 1;
+}
+
+/* Add row / add item button â€” mirrors .sbf-add-btn */
+.bdf-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--theme-elevation-400);
+  font-size: 13px;
+  font-family: var(--font-body);
+  line-height: 24px;
+  transition: color 0.1s;
+}
+.bdf-add-btn:hover {
+  color: var(--theme-elevation-800);
+}
+.bdf-add-btn__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+/* â”€â”€ Media / Upload picker â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
+.bdf-upload-area {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* When media is already selected */
+.bdf-upload-selected {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px 6px 6px;
+  background: var(--theme-elevation-50);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: 4px;
+}
+
+.bdf-thumb {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 3px;
+  background: var(--theme-elevation-100);
+  flex-shrink: 0;
+  border: 1px solid var(--theme-elevation-150);
+  display: block;
+}
+
+.bdf-thumb-placeholder {
+  width: 44px;
+  height: 44px;
+  border-radius: 3px;
+  background: var(--theme-elevation-100);
+  flex-shrink: 0;
+  border: 1px solid var(--theme-elevation-150);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--theme-elevation-400);
+}
+
+.bdf-upload-name {
+  flex: 1;
+  font-size: 13px;
+  color: var(--theme-elevation-800);
+  font-family: var(--font-body);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.bdf-upload-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* Browse / choose button */
+.bdf-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 14px;
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--style-radius-s, 4px);
+  color: var(--theme-elevation-800);
+  font-size: 13px;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s;
+  white-space: nowrap;
+  box-sizing: border-box;
+  line-height: 1;
+}
+.bdf-upload-btn:hover {
+  background: var(--theme-elevation-150);
+  border-color: var(--theme-elevation-250);
+}
+
+/* Icon-only button (remove / swap) */
+.bdf-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--theme-elevation-500);
+  font-size: 12px;
+  padding: 0;
+  flex-shrink: 0;
+  font-family: var(--font-body);
+  transition: background 0.1s, color 0.1s;
+  line-height: 1;
+}
+.bdf-icon-btn:hover {
+  background: var(--theme-elevation-150);
+  color: var(--theme-elevation-900);
+}
+.bdf-icon-btn--danger:hover {
+  background: var(--theme-error-50, rgba(239, 68, 68, 0.08));
+  color: var(--theme-error-500, #ef4444);
+}
+
+/* â”€â”€ States â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
+.bdf-empty {
+  padding: calc(var(--base, 16px) * 1.5) var(--base, 16px);
+  border: 1px dashed var(--theme-elevation-200);
+  border-radius: 4px;
+  text-align: center;
+  color: var(--theme-elevation-400);
+  font-size: 13px;
+  font-family: var(--font-body);
+  line-height: 20px;
+}
+
+.bdf-loading {
+  padding: 12px var(--base, 16px);
+  color: var(--theme-elevation-400);
+  font-size: 13px;
+  font-family: var(--font-body);
+}
+
+.bdf-error {
+  padding: 10px 14px;
+  color: var(--theme-error-500, #ef4444);
+  font-size: 13px;
+  font-family: var(--font-body);
+  background: var(--theme-error-50, rgba(239, 68, 68, 0.05));
+  border: 1px solid var(--theme-error-100, rgba(239, 68, 68, 0.15));
+  border-radius: 4px;
+}
+
+

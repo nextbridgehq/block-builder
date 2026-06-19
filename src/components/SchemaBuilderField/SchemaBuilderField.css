@@ -1,0 +1,361 @@
+﻿/* â”€â”€ Schema Builder Field â€” Payload light theme tokens â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
+/* â”€â”€ Input â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.sbf-input {
+  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
+  font-family: var(--font-body);
+  width: 100%;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--style-radius-s, 4px);
+  background: var(--theme-input-bg, var(--theme-elevation-0));
+  color: var(--theme-elevation-800);
+  font-size: 1rem;
+  height: 40px;
+  line-height: 20px;
+  padding: 8px 15px;
+  -webkit-appearance: none;
+  transition-property: border, box-shadow, background-color;
+  transition-duration: 0.1s, 0.1s, 0.5s;
+  transition-timing-function: cubic-bezier(0, 0.2, 0.2, 1);
+  box-sizing: border-box;
+}
+.sbf-input:hover:not(:disabled) {
+  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.2);
+  border-color: var(--theme-elevation-250);
+}
+.sbf-input:focus,
+.sbf-input:focus-within,
+.sbf-input:active {
+  border-color: var(--theme-elevation-400);
+  outline: 0;
+}
+.sbf-input:disabled {
+  background: var(--theme-elevation-100);
+  color: var(--theme-elevation-400);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.sbf-input:disabled:hover {
+  border-color: var(--theme-elevation-150);
+  box-shadow: none;
+}
+.sbf-input::placeholder {
+  color: var(--theme-elevation-400);
+  font-weight: 400;
+  font-size: 1rem;
+}
+
+/* â”€â”€ Select â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.sbf-select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+
+/* â”€â”€ Field label â€” mirrors Payload .field-label â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.sbf-label {
+  display: flex;
+  align-items: center;
+  padding-bottom: 5px;
+  color: var(--theme-elevation-800);
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 400;
+}
+.sbf-label--required::after {
+  content: '*';
+  color: var(--theme-error-500, #ef4444);
+  margin-left: 5px;
+}
+
+/* â”€â”€ Field description â€” mirrors .field-description â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.sbf-description {
+  display: flex;
+  color: var(--theme-elevation-400);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  margin-top: calc(var(--base, 16px) / 4);
+  font-family: var(--font-body);
+}
+
+/* â”€â”€ Collapsible row â€” mirrors .collapsible--style-default â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.sbf-row {
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--style-radius-s, 4px);
+  overflow: hidden;
+  transition: border-color 0.1s;
+}
+.sbf-row:hover { border-color: var(--theme-elevation-300); }
+
+/* Row header â€” mirrors .collapsible__toggle-wrap */
+.sbf-row__header {
+  position: relative;
+  padding: 8px 8px 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--theme-elevation-50);
+  line-height: 24px;
+  gap: 4px;
+  border-top-right-radius: var(--style-radius-s, 4px);
+  border-top-left-radius: var(--style-radius-s, 4px);
+  cursor: pointer;
+  user-select: none;
+  width: 100%;
+  border: none;
+  text-align: left;
+  font-family: var(--font-body);
+  transition: background 0.1s;
+}
+.sbf-row__header:hover { background: var(--theme-elevation-100); }
+.sbf-row--collapsed .sbf-row__header {
+  border-bottom-right-radius: var(--style-radius-s, 4px);
+  border-bottom-left-radius: var(--style-radius-s, 4px);
+}
+
+/* Row content â€” mirrors .collapsible__content */
+.sbf-row__content {
+  background: var(--theme-elevation-0);
+  border-bottom-left-radius: var(--style-radius-s, 4px);
+  border-bottom-right-radius: var(--style-radius-s, 4px);
+  padding: var(--base, 16px);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--base, 16px) * 0.75);
+  border-top: 1px solid var(--theme-elevation-150);
+}
+
+/* â”€â”€ Row label & badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.sbf-row__label {
+  flex: 1;
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 400;
+  color: var(--theme-text, var(--theme-elevation-800));
+  font-family: var(--font-body);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sbf-row__label--empty {
+  color: var(--theme-elevation-400);
+  font-style: italic;
+}
+
+.sbf-type-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: var(--font-body);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  background: var(--theme-elevation-150);
+  color: var(--theme-elevation-600);
+  flex-shrink: 0;
+}
+
+/* â”€â”€ Icon action button â€” mirrors .collapsible__actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.sbf-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  border-radius: var(--style-radius-s, 4px);
+  cursor: pointer;
+  color: var(--theme-elevation-500);
+  font-size: 13px;
+  padding: 0;
+  flex-shrink: 0;
+  font-family: var(--font-body);
+  transition: background 0.1s, color 0.1s;
+  line-height: 1;
+}
+.sbf-icon-btn:hover {
+  background: var(--theme-elevation-150);
+  color: var(--theme-elevation-900);
+}
+.sbf-icon-btn--danger:hover {
+  background: var(--theme-error-50, rgba(239, 68, 68, 0.08));
+  color: var(--theme-error-500, #ef4444);
+}
+
+/* â”€â”€ 2-column grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.sbf-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: calc(var(--base, 16px) * 0.75);
+}
+
+/* â”€â”€ Checkbox row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.sbf-checkbox-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.sbf-checkbox-wrap input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  cursor: pointer;
+  border: 1px solid var(--theme-elevation-300);
+  border-radius: 2px;
+  accent-color: var(--theme-success-500, #22c55e);
+}
+.sbf-checkbox-label {
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--theme-elevation-800);
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+/* â”€â”€ Flags row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.sbf-flags-row {
+  display: flex;
+  gap: calc(var(--base, 16px) * 1.5);
+  flex-wrap: wrap;
+}
+
+/* â”€â”€ Section accordion (Admin settings / Conditions) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.sbf-section {
+  border: 1px solid var(--theme-elevation-100);
+  border-radius: var(--style-radius-s, 4px);
+  overflow: hidden;
+}
+.sbf-section__toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--theme-elevation-50);
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 400;
+  font-family: var(--font-body);
+  color: var(--theme-elevation-600);
+  line-height: 20px;
+  text-align: left;
+  transition: background 0.1s;
+  gap: 8px;
+}
+.sbf-section__toggle:hover { background: var(--theme-elevation-100); }
+.sbf-section__toggle-icon {
+  font-size: 10px;
+  color: var(--theme-elevation-400);
+  flex-shrink: 0;
+  transition: transform 0.15s;
+}
+.sbf-section__toggle--open .sbf-section__toggle-icon { transform: rotate(90deg); }
+.sbf-section__body {
+  padding: 12px;
+  background: var(--theme-elevation-0);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--base, 16px) * 0.75);
+  border-top: 1px solid var(--theme-elevation-100);
+}
+
+/* â”€â”€ Nested fields â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.sbf-nested {
+  border-left: 2px solid var(--theme-elevation-200);
+  padding-left: 12px;
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--base, 16px) / 2);
+}
+
+/* â”€â”€ Options row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.sbf-options-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: calc(var(--base, 16px) * 0.5);
+  align-items: center;
+}
+
+/* â”€â”€ Conditions grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.sbf-conditions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: calc(var(--base, 16px) * 0.5);
+  align-items: end;
+}
+
+/* â”€â”€ Add Field button â€” mirrors Payload array add-row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.sbf-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--theme-elevation-400);
+  font-size: 13px;
+  font-family: var(--font-body);
+  line-height: 24px;
+  transition: color 0.1s;
+  margin-top: 2px;
+}
+.sbf-add-btn:hover:not(:disabled) { color: var(--theme-elevation-800); }
+.sbf-add-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+.sbf-add-btn__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+  line-height: 1;
+  transition: border-color 0.1s;
+}
+
+.sbf-add-btn--small { font-size: 12px; gap: 5px; }
+.sbf-add-btn--small .sbf-add-btn__icon { width: 18px; height: 18px; font-size: 12px; }
+
+/* â”€â”€ Section heading â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.sbf-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: calc(var(--base, 16px) / 2);
+}
+.sbf-section-label {
+  display: flex;
+  align-items: center;
+  color: var(--theme-elevation-800);
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 400;
+}
+
+/* â”€â”€ Empty state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.sbf-empty {
+  padding: calc(var(--base, 16px) * 1.5) var(--base, 16px);
+  border: 1px dashed var(--theme-elevation-200);
+  border-radius: var(--style-radius-s, 4px);
+  text-align: center;
+  color: var(--theme-elevation-400);
+  font-size: 13px;
+  font-family: var(--font-body);
+  line-height: 20px;
+}
+
+
