@@ -1,7 +1,7 @@
 {
   "name": "@nextbridgehq/payload-block-builder",
-  "version": "0.1.0",
-  "description": "Payload v3 plugin — visual dynamic block builder with DB-driven schema versioning",
+  "version": "0.1.1",
+  "description": "Block Builder for Payload CMS",
   "keywords": ["payload", "payload-plugin", "cms", "block-builder", "dynamic-blocks"],
   "homepage": "https://github.com/nextbridgehq/block-builder",
   "repository": {
