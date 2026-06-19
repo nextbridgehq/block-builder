@@ -103,7 +103,7 @@ export function FieldRow({
             transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)',
           }}
         >
-          â–¶
+          {'>'}
         </span>
 
         <span className={`sbf-row__label${!field.name ? ' sbf-row__label--empty' : ''}`}>
@@ -130,12 +130,12 @@ export function FieldRow({
           >
             {onMoveUp && (
               <button type="button" className="sbf-icon-btn" onClick={onMoveUp} title="Move up">
-                â†‘
+                ^
               </button>
             )}
             {onMoveDown && (
               <button type="button" className="sbf-icon-btn" onClick={onMoveDown} title="Move down">
-                â†“
+                v
               </button>
             )}
             <button
@@ -144,7 +144,7 @@ export function FieldRow({
               onClick={onRemove}
               title="Remove field"
             >
-              âœ•
+              x
             </button>
           </div>
         )}
@@ -333,7 +333,7 @@ export function FieldRow({
               onClick={() => setShowAdmin((p) => !p)}
             >
               Admin &amp; UI settings
-              <span className="sbf-section__toggle-icon">â–¶</span>
+              <span className="sbf-section__toggle-icon">{'>'}</span>
             </button>
             {showAdmin && (
               <div className="sbf-section__body">
@@ -402,7 +402,7 @@ export function FieldRow({
                   {field.conditions!.length} rule{field.conditions!.length !== 1 ? 's' : ''}
                 </span>
               )}
-              <span className="sbf-section__toggle-icon">â–¶</span>
+              <span className="sbf-section__toggle-icon">{'>'}</span>
             </button>
             {showConditions && (
               <div className="sbf-section__body">
@@ -415,8 +415,8 @@ export function FieldRow({
                     onChange={(e) => set('conditionMode', e.target.value as 'AND' | 'OR')}
                     style={{ width: 'auto', minWidth: 240 }}
                   >
-                    <option value="AND">AND â€” all conditions must match</option>
-                    <option value="OR">OR â€” any condition must match</option>
+                    <option value="AND">AND - all conditions must match</option>
+                    <option value="OR">OR - any condition must match</option>
                   </select>
                 </FieldWrap>
 
@@ -479,7 +479,7 @@ export function FieldRow({
                           set('conditions', (field.conditions ?? []).filter((_, k) => k !== ci))
                         }}
                       >
-                        âœ•
+                        x
                       </button>
                     )}
                   </div>

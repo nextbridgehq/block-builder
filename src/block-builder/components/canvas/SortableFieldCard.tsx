@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import React from 'react'
 import { useSortable } from '@dnd-kit/sortable'
@@ -7,23 +7,23 @@ import { useBuilderStore } from '../../store/builder.store'
 import type { FieldDefinition } from '../../types'
 
 const ICON_MAP: Record<string, string> = {
-  text: 'ðŸ“',
-  textarea: 'ðŸ“„',
-  richText: 'ðŸ“°',
-  number: 'ðŸ”¢',
-  checkbox: 'â˜‘',
-  select: 'â–¾',
-  radio: 'â—‰',
-  date: 'ðŸ“…',
-  upload: 'ðŸ“Ž',
-  email: 'âœ‰',
-  code: 'â€¹â€º',
-  point: 'â—Ž',
-  relationship: 'â‡Œ',
-  array: 'â–¤',
-  group: 'â–£',
-  json: '{}',
-  ui: 'â—ˆ',
+  text: 'T',
+  textarea: 'Tx',
+  richText: 'RT',
+  number: '#',
+  checkbox: '[x]',
+  select: 'v',
+  radio: '(o)',
+  date: 'D',
+  upload: '^',
+  email: '@',
+  code: '<>',
+  point: 'P',
+  relationship: '->>',
+  array: '[]',
+  group: '{ }',
+  json: '{ }',
+  ui: 'UI',
 }
 
 type Props = {
@@ -61,7 +61,7 @@ export function SortableFieldCard({ field, blockId, index }: Props) {
         onClick={() => setActiveField(isActive ? null : field.id)}
       >
         <span className="bb-field-card__icon">
-          {ICON_MAP[field.type] ?? 'â—»'}
+          {ICON_MAP[field.type] ?? '?'}
         </span>
 
         <div className="bb-field-card__body">
@@ -86,11 +86,9 @@ export function SortableFieldCard({ field, blockId, index }: Props) {
           className="bb-field-card__delete"
           title="Remove field"
         >
-          âœ•
+          x
         </button>
       </div>
     </div>
   )
 }
-
-

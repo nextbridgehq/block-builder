@@ -5,7 +5,7 @@
   FieldType,
 } from './types'
 
-// â”€â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€â"€ Constants â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 const VALID_FIELD_TYPES: Set<FieldType> = new Set([
   'text',
@@ -44,7 +44,7 @@ const VALID_CONDITION_OPERATORS = new Set([
   'empty',
 ])
 
-// â”€â”€â”€ Condition validator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€â"€ Condition validator â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 function validateConditions(
   conditions: unknown,
@@ -76,7 +76,7 @@ function validateConditions(
   })
 }
 
-// â”€â”€â”€ Validation-rules object validator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€â"€ Validation-rules object validator â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 function validateValidationRules(
   v: Record<string, unknown>,
@@ -105,7 +105,7 @@ function validateValidationRules(
     typeof v.maxLength === 'number' &&
     v.minLength > v.maxLength
   ) {
-    errors.push(`${path}: "minLength" (${v.minLength}) must be â‰¤ "maxLength" (${v.maxLength}).`)
+    errors.push(`${path}: "minLength" (${v.minLength}) must be <= "maxLength" (${v.maxLength}).`)
   }
 
   if (
@@ -113,7 +113,7 @@ function validateValidationRules(
     typeof v.max === 'number' &&
     v.min > v.max
   ) {
-    errors.push(`${path}: "min" (${v.min}) must be â‰¤ "max" (${v.max}).`)
+    errors.push(`${path}: "min" (${v.min}) must be <= "max" (${v.max}).`)
   }
 
   if (
@@ -121,7 +121,7 @@ function validateValidationRules(
     typeof v.maxRows === 'number' &&
     v.minRows > v.maxRows
   ) {
-    errors.push(`${path}: "minRows" (${v.minRows}) must be â‰¤ "maxRows" (${v.maxRows}).`)
+    errors.push(`${path}: "minRows" (${v.minRows}) must be <= "maxRows" (${v.maxRows}).`)
   }
 
   if (v.regex !== undefined) {
@@ -147,7 +147,7 @@ function validateValidationRules(
   }
 }
 
-// â”€â”€â”€ Per-field validator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€â"€ Per-field validator â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 function validateField(field: unknown, path: string, errors: string[], warnings: string[]): void {
   if (!field || typeof field !== 'object' || Array.isArray(field)) {
@@ -262,7 +262,7 @@ function validateField(field: unknown, path: string, errors: string[], warnings:
       typeof f.max === 'number' &&
       f.min > f.max
     ) {
-      errors.push(`${path}: "min" (${f.min}) must be â‰¤ "max" (${f.max}).`)
+      errors.push(`${path}: "min" (${f.min}) must be <= "max" (${f.max}).`)
     }
   }
 
@@ -321,7 +321,7 @@ function validateField(field: unknown, path: string, errors: string[], warnings:
       typeof f.maxBlocks === 'number' &&
       f.minBlocks > f.maxBlocks
     ) {
-      errors.push(`${path}: "minBlocks" (${f.minBlocks}) must be â‰¤ "maxBlocks" (${f.maxBlocks}).`)
+      errors.push(`${path}: "minBlocks" (${f.minBlocks}) must be <= "maxBlocks" (${f.maxBlocks}).`)
     }
   }
 }
@@ -348,7 +348,7 @@ function validateFields(
   })
 }
 
-// â”€â”€â”€ Public API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€â"€ Public API â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 export function validateBlockSchema(schema: unknown): ValidationResult {
   const errors: string[] = []

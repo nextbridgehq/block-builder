@@ -47,7 +47,7 @@ export function FieldPalette() {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Searchâ€¦"
+          placeholder="Search..."
           className="bb-palette__search"
         />
       </div>

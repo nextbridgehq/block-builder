@@ -53,7 +53,7 @@ export function BuilderCanvas() {
     <div className={`bb-canvas${isReadOnly ? ' bb-canvas--readonly' : ''}`}>
       <div className="bb-canvas__inner">
         <div className="bb-canvas__header">
-          {block.slug} â€” {block.fields.length} field{block.fields.length !== 1 ? 's' : ''}
+          {block.slug} - {block.fields.length} field{block.fields.length !== 1 ? 's' : ''}
         </div>
 
         {block.fields.length === 0 ? (

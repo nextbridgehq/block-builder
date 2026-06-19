@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import React, { useCallback, useEffect, useState } from 'react'
 import { useBuilderStore } from '../../store/builder.store'
@@ -155,7 +155,7 @@ export function BuilderShell({ loadSlug }: Props) {
       />
 
       {loading && (
-        <div className="bb-loading-bar">Loadingâ€¦</div>
+        <div className="bb-loading-bar">Loading...</div>
       )}
 
       {loadError && (
@@ -164,9 +164,9 @@ export function BuilderShell({ loadSlug }: Props) {
 
       {isReadOnly && !loading && (
         <div className="bb-readonly-banner">
-          <span className="bb-readonly-banner__icon">ðŸ‘</span>
+          <span className="bb-readonly-banner__icon">[i]</span>
           <span>
-            You are viewing a previous version â€” read only.
+            You are viewing a previous version - read only.
             <button
               type="button"
               className="bb-readonly-banner__btn"
@@ -193,7 +193,7 @@ export function BuilderShell({ loadSlug }: Props) {
           onClick={() => setShowCodePreview((p) => !p)}
           className={`bb-footer__toggle${showCodePreview ? ' bb-footer__toggle--open' : ''}`}
         >
-          {showCodePreview ? 'â–¼' : 'â–¶'} Code Preview
+          {showCodePreview ? 'v' : '>'} Code Preview
         </button>
         {showCodePreview && (
           <div className="bb-footer__content">
@@ -202,14 +202,14 @@ export function BuilderShell({ loadSlug }: Props) {
         )}
       </div>
 
-      {/* Mobile bottom nav â€” hidden on desktop via CSS */}
+      {/* Mobile bottom nav - hidden on desktop via CSS */}
       <nav className="bb-mobile-nav" aria-label="Panel navigation">
         {(
           [
-            { id: 'blocks',  icon: 'â¬¡', label: 'Blocks'  },
-            { id: 'canvas',  icon: 'â–¦', label: 'Canvas'  },
-            { id: 'palette', icon: 'ï¼‹', label: 'Fields'  },
-            { id: 'config',  icon: 'âš™', label: 'Config'  },
+            { id: 'blocks',  icon: 'B',  label: 'Blocks'  },
+            { id: 'canvas',  icon: '[]', label: 'Canvas'  },
+            { id: 'palette', icon: '+',  label: 'Fields'  },
+            { id: 'config',  icon: '*',  label: 'Config'  },
           ] as const
         ).map(({ id, icon, label }) => (
           <button
@@ -226,5 +226,3 @@ export function BuilderShell({ loadSlug }: Props) {
     </div>
   )
 }
-
-

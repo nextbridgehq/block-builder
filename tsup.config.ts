@@ -20,6 +20,17 @@ export default defineConfig([
       '@payloadcms/richtext-lexical',
     ],
   },
+  // CLI init script
+  {
+    entry: { 'bin/init': 'src/bin/init.ts' },
+    format: ['esm'],
+    dts: false,
+    splitting: false,
+    sourcemap: false,
+    outDir: 'dist',
+    external: [],
+    banner: { js: '#!/usr/bin/env node' },
+  },
   // Client-side barrel (UI components — BlockDataField, SchemaBuilderField, BuilderShell, etc.)
   {
     entry: { client: 'src/client.ts' },

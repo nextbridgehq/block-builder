@@ -1,6 +1,6 @@
 {
   "name": "@nextbridgehq/payload-block-builder",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Block Builder for Payload CMS",
   "keywords": ["payload", "payload-plugin", "cms", "block-builder", "dynamic-blocks"],
   "homepage": "https://github.com/nextbridgehq/block-builder",
@@ -30,6 +30,9 @@
     "./builder.css": "./src/block-builder/builder.css",
     "./block-data-field.css": "./src/components/BlockDataField/BlockDataField.css",
     "./schema-builder-field.css": "./src/components/SchemaBuilderField/SchemaBuilderField.css"
+  },
+  "bin": {
+    "payload-block-builder": "./dist/bin/init.js"
   },
   "files": [
     "dist",

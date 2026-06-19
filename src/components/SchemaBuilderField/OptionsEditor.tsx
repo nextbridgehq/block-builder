@@ -87,7 +87,7 @@ export function OptionsEditor({ options, onChange, readOnly }: Props) {
               title="Remove option"
               onClick={() => removeOption(i)}
             >
-              âœ•
+              x
             </button>
           )}
         </div>

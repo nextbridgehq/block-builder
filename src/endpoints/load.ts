@@ -68,7 +68,7 @@ export const loadEndpoint: PayloadHandler = async (req) => {
     version = (latestResult.docs[0] as unknown as Record<string, unknown>) ?? null
   }
 
-  // No versions exist at all â€” return empty block so builder starts blank
+  // No versions exist at all â€" return empty block so builder starts blank
   if (!version) {
     const block = schemaToBuilderBlock(slug, name, {}, [])
     return Response.json({ block, versionId: null, versionNumber: null, isCurrent: true })

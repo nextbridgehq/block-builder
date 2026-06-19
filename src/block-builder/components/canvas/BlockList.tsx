@@ -46,7 +46,7 @@ export function BlockList() {
                   className="bb-block-action"
                   title="Duplicate"
                 >
-                  â§‰
+                  =
                 </button>
                 <button
                   type="button"
@@ -54,7 +54,7 @@ export function BlockList() {
                   className="bb-block-action bb-block-action--danger"
                   title="Delete"
                 >
-                  âœ•
+                  x
                 </button>
               </div>
             </div>

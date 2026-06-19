@@ -33,7 +33,7 @@ export const BlockDefinitionVersions: CollectionConfig = {
       name: 'label',
       type: 'text',
       required: false,
-      admin: { description: 'Optional display name, e.g. "v2 â€” added hero image".' },
+      admin: { description: 'Optional display name, e.g. "v2 - added hero image".' },
     },
     {
       name: 'schema',

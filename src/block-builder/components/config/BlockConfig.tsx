@@ -72,7 +72,7 @@ export function BlockConfig() {
           type="text"
           value={block.imageURL ?? ''}
           onChange={(e) => updateBlock(block.id, { imageURL: e.target.value || undefined })}
-          placeholder="https://â€¦"
+          placeholder="https://..."
           className="bb-input"
         />
       </div>

@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useBuilderStore } from '../../store/builder.store'
 import { generateAllBlocks, generateIndexFile } from '../../lib/codegen'
 
-// â”€â”€â”€ Tiny TypeScript syntax tokeniser â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€â"€ Tiny TypeScript syntax tokeniser â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 type TokenKind = 'keyword' | 'string' | 'comment' | 'type' | 'number' | 'punct' | 'plain'
 
@@ -91,7 +91,7 @@ function HighlightedCode({ code }: { code: string }) {
   )
 }
 
-// â”€â”€â”€ CodePreview component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€â"€ CodePreview component â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 export function CodePreview() {
   const blocks = useBuilderStore((s) => s.blocks)
@@ -229,7 +229,7 @@ export function CodePreview() {
             gap: '0.25rem',
           }}
         >
-          {copied ? 'âœ“ Copied' : 'â§‰ Copy'}
+          {copied ? 'Copied' : 'Copy'}
         </button>
       </div>
 

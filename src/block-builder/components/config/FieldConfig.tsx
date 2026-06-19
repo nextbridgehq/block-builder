@@ -187,7 +187,7 @@ export function FieldConfig() {
                 className="bb-option-delete"
                 title="Remove option"
               >
-                âœ•
+                x
               </button>
             </div>
           ))}

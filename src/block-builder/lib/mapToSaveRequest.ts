@@ -22,7 +22,7 @@ export function mapToSaveRequest(block: BlockDefinition): SaveSchemaRequest {
   const fields = block.fields
     .filter((f) => {
       if (UNSUPPORTED.has(f.type)) {
-        console.warn(`[block-builder] Field type "${f.type}" is not supported in this project â€” skipping field "${f.name}"`);
+        console.warn(`[block-builder] Field type "${f.type}" is not supported in this project â€" skipping field "${f.name}"`);
         return false;
       }
       return true;

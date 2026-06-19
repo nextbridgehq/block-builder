@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useField, useFormFields, useListDrawer } from '@payloadcms/ui'
 import type { BlockFieldDefinition } from '../../validation/types'
 
-// â”€â”€â”€ MediaPicker â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€â"€ MediaPicker â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 interface MediaValue {
   id: string | number
@@ -59,7 +59,7 @@ function MediaPicker({ label, required, value, onChange }: MediaPickerProps) {
             {media?.url ? (
               <img src={media.url as string} alt={media.alt as string ?? ''} className="bdf-thumb" />
             ) : (
-              <div className="bdf-thumb-placeholder">ðŸ–¼</div>
+              <div className="bdf-thumb-placeholder">[img]</div>
             )}
             <span className="bdf-upload-name">
               {media?.filename ? String(media.filename) : `ID: ${String(mediaId)}`}
@@ -74,7 +74,7 @@ function MediaPicker({ label, required, value, onChange }: MediaPickerProps) {
                 title="Remove media"
                 onClick={() => onChange(null)}
               >
-                âœ•
+                x
               </button>
             </div>
           </div>
@@ -91,7 +91,7 @@ function MediaPicker({ label, required, value, onChange }: MediaPickerProps) {
   )
 }
 
-// â”€â”€â”€ SchemaForm â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€â"€ SchemaForm â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 interface SchemaFormProps {
   schema: BlockFieldDefinition[]
@@ -119,7 +119,7 @@ function SchemaForm({ schema, value, onChange }: SchemaFormProps) {
   )
 }
 
-// â”€â”€â”€ FieldInput â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€â"€ FieldInput â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 interface FieldInputProps {
   field: BlockFieldDefinition
@@ -273,7 +273,7 @@ function FieldInput({ field, value, onChange }: FieldInputProps) {
             value={(value as string) ?? ''}
             onChange={(e) => onChange(e.target.value)}
           >
-            <option value="">â€” select â€”</option>
+            <option value="">-- select --</option>
             {(field.options ?? []).map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
@@ -398,7 +398,7 @@ function FieldInput({ field, value, onChange }: FieldInputProps) {
                     className="bdf-remove-btn"
                     onClick={() => onChange(rows.filter((_, j) => j !== i))}
                   >
-                    âœ• Remove row
+                    x Remove row
                   </button>
                 </div>
               ))}
@@ -440,7 +440,7 @@ function FieldInput({ field, value, onChange }: FieldInputProps) {
   }
 }
 
-// â”€â”€â”€ BlockDataField â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€â"€ BlockDataField â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 export function BlockDataField({ path }: { path: string }) {
   const { value, setValue } = useField<Record<string, unknown>>({ path })
@@ -501,7 +501,7 @@ export function BlockDataField({ path }: { path: string }) {
   }
 
   if (loading) {
-    return <div className="bdf-loading">Loading schemaâ€¦</div>
+    return <div className="bdf-loading">Loading schema...</div>
   }
 
   if (error) {

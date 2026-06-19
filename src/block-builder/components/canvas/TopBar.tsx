@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
 import { useBuilderStore } from '../../store/builder.store'
@@ -129,7 +129,7 @@ export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selecte
       <div className="bb-topbar">
         <div className="bb-topbar__brand">
           <span className="bb-topbar__title">Block Builder</span>
-          {isDirty && !isReadOnly && <span className="bb-topbar__dirty">â— unsaved</span>}
+          {isDirty && !isReadOnly && <span className="bb-topbar__dirty">* unsaved</span>}
         </div>
 
         <div className="bb-topbar__selectors">
@@ -142,9 +142,9 @@ export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selecte
                 className="bb-block-picker__trigger"
                 onClick={() => setBlockPickerOpen((o) => !o)}
               >
-                <span className="bb-block-picker__icon">â¬¡</span>
+                <span className="bb-block-picker__icon">B</span>
                 <span>{activeBlockDef?.name ?? activeSlug ?? 'Select a block'}</span>
-                <span className="bb-version-selector__chevron">â–¾</span>
+                <span className="bb-version-selector__chevron">v</span>
               </button>
 
               {blockPickerOpen && (
@@ -180,7 +180,7 @@ export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selecte
                 <span className={`bb-version-selector__dot${selectedVersion?.isCurrent ? ' bb-version-selector__dot--current' : ' bb-version-selector__dot--old'}`} />
                 <span>{selectedVersion?.label ?? `v${selectedVersion?.versionNumber ?? '?'}`}</span>
                 {selectedVersion?.isCurrent && <span className="bb-version-selector__badge">current</span>}
-                <span className="bb-version-selector__chevron">â–¾</span>
+                <span className="bb-version-selector__chevron">v</span>
               </button>
 
               {versionDropdownOpen && (
@@ -202,7 +202,7 @@ export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selecte
                         {v.isCurrent && <span className="bb-version-selector__badge">current</span>}
                       </span>
                       <span className="bb-version-dropdown__meta">
-                        {v.changelog ? `${v.changelog.slice(0, 32)}${v.changelog.length > 32 ? 'â€¦' : ''}` : formatDate(v.createdAt)}
+                        {v.changelog ? `${v.changelog.slice(0, 32)}${v.changelog.length > 32 ? '...' : ''}` : formatDate(v.createdAt)}
                       </span>
                     </button>
                   ))}
@@ -245,7 +245,7 @@ export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selecte
                 disabled={notification?.status === 'publishing' || !activeBlock}
                 className="bb-btn bb-btn--warning"
               >
-                {notification?.status === 'publishing' ? 'Restoringâ€¦' : 'Restore as new version'}
+                {notification?.status === 'publishing' ? 'Restoring...' : 'Restore as new version'}
               </button>
             </>
           ) : (
@@ -255,20 +255,20 @@ export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selecte
               disabled={notification?.status === 'publishing' || !activeBlock}
               className="bb-btn bb-btn--primary"
             >
-              {notification?.status === 'publishing' ? 'Publishingâ€¦' : 'Publish to Payload'}
+              {notification?.status === 'publishing' ? 'Publishing...' : 'Publish to Payload'}
             </button>
           )}
         </div>
       </div>
 
-      {/* â”€â”€ Notification overlay â”€â”€ */}
+      {/* Notification overlay */}
       {notification?.status === 'publishing' && (
         <div className="bb-notify bb-notify--publishing">
           <div className="bb-notify__box">
             <div className="bb-notify__spinner" />
             <div className="bb-notify__body">
               <p className="bb-notify__title">
-                {isReadOnly ? 'Restoring versionâ€¦' : 'Publishing to Payloadâ€¦'}
+                {isReadOnly ? 'Restoring version...' : 'Publishing to Payload...'}
               </p>
               <p className="bb-notify__sub">Validating schema and saving block definition.</p>
             </div>
@@ -279,12 +279,12 @@ export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selecte
       {notification?.status === 'success' && (
         <div className="bb-notify bb-notify--success">
           <div className="bb-notify__box">
-            <span className="bb-notify__icon">âœ“</span>
+            <span className="bb-notify__icon">OK</span>
             <div className="bb-notify__body">
               <p className="bb-notify__title">{notification.msg}</p>
               <p className="bb-notify__sub">The block definition and version have been saved.</p>
             </div>
-            <button className="bb-notify__close" onClick={() => setNotification(null)}>âœ•</button>
+            <button className="bb-notify__close" onClick={() => setNotification(null)}>x</button>
           </div>
         </div>
       )}
@@ -292,7 +292,7 @@ export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selecte
       {notification?.status === 'error' && (
         <div className="bb-notify bb-notify--error">
           <div className="bb-notify__box">
-            <span className="bb-notify__icon">âœ•</span>
+            <span className="bb-notify__icon">!</span>
             <div className="bb-notify__body">
               <p className="bb-notify__title">{notification.title}</p>
               <p className="bb-notify__sub">Fix the following errors before publishing:</p>
@@ -302,12 +302,10 @@ export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selecte
                 ))}
               </ul>
             </div>
-            <button className="bb-notify__close" onClick={() => setNotification(null)}>âœ•</button>
+            <button className="bb-notify__close" onClick={() => setNotification(null)}>x</button>
           </div>
         </div>
       )}
     </>
   )
 }
-
-
