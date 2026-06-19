@@ -28,6 +28,18 @@ export const dynamicBlocksPlugin = (options: DynamicBlocksPluginOptions = {}): P
 
     const config: Config = { ...incomingConfig }
 
+    // Inject sidebar nav link
+    config.admin = {
+      ...config.admin,
+      components: {
+        ...config.admin?.components,
+        afterNavLinks: [
+          ...(config.admin?.components?.afterNavLinks ?? []),
+          '@nextbridgehq/payload-block-builder/client#BlockBuilderNavLink',
+        ],
+      },
+    }
+
     // â”€â”€ Register collections â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     config.collections = [
       ...(config.collections ?? []),

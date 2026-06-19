@@ -5,6 +5,7 @@ export { BlockDataField } from './components/BlockDataField/index'
 export { SchemaBuilderField } from './components/SchemaBuilderField/index'
 export { EditInBuilderButton } from './components/EditInBuilderButton/index'
 export { BuilderShell } from './block-builder/components/canvas/BuilderShell'
+export { BlockBuilderNavLink } from './components/BlockBuilderNavLink/index'
 
 
 

@@ -37,6 +37,8 @@ export default buildConfig({
 
 ```tsx
 // app/block-builder/page.tsx
+'use client'
+
 import { BuilderShell } from '@nextbridgehq/payload-block-builder/client'
 import '@nextbridgehq/payload-block-builder/builder.css'
 
