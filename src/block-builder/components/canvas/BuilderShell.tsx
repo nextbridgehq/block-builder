@@ -53,7 +53,10 @@ export function BuilderShell({ loadSlug }: Props) {
           (json.docs ?? []).map((d) => ({ id: String(d.id), slug: d.slug, name: d.name })),
         )
       })
-      .catch(() => {})
+      .catch((err: unknown) => {
+        console.error('[block-builder] Failed to load block definitions:', err)
+        setLoadError('Could not load block definitions. Please refresh the page.')
+      })
   }, [])
 
   const loadVersionsForSlug = useCallback(async (slug: string): Promise<VersionInfo[]> => {

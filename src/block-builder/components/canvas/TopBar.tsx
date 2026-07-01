@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
+import { Blocks, ChevronDown, X } from 'lucide-react'
 import { useBuilderStore } from '../../store/builder.store'
 import { mapToSaveRequest } from '../../lib/mapToSaveRequest'
 import { generateAllBlocks, generateIndexFile } from '../../lib/codegen'
@@ -64,8 +65,8 @@ export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selecte
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
-  async function handlePublish() {
-    if (!activeBlock || isReadOnly) return
+  async function handlePublish(): Promise<boolean> {
+    if (!activeBlock || isReadOnly) return false
     setNotification({ status: 'publishing' })
     try {
       const req = mapToSaveRequest(activeBlock)
@@ -87,13 +88,15 @@ export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selecte
           status: 'success',
           msg: `v${json.versionNumber ?? '?'} published successfully!`,
         })
-        await onAfterPublish()
+        onAfterPublish()
+        return true
       } else {
         setNotification({
           status: 'error',
           title: 'Failed to publish block',
           errors: json.errors ?? ['An unknown error occurred.'],
         })
+        return false
       }
     } catch (err) {
       setNotification({
@@ -101,6 +104,7 @@ export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selecte
         title: 'Network error',
         errors: [err instanceof Error ? err.message : 'Could not reach the server.'],
       })
+      return false
     }
   }
 
@@ -142,9 +146,9 @@ export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selecte
                 className="bb-block-picker__trigger"
                 onClick={() => setBlockPickerOpen((o) => !o)}
               >
-                <span className="bb-block-picker__icon">B</span>
+                <Blocks size={14} strokeWidth={1.75} className="bb-block-picker__icon" />
                 <span>{activeBlockDef?.name ?? activeSlug ?? 'Select a block'}</span>
-                <span className="bb-version-selector__chevron">v</span>
+                <ChevronDown size={14} strokeWidth={1.75} className="bb-version-selector__chevron" />
               </button>
 
               {blockPickerOpen && (
@@ -180,7 +184,7 @@ export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selecte
                 <span className={`bb-version-selector__dot${selectedVersion?.isCurrent ? ' bb-version-selector__dot--current' : ' bb-version-selector__dot--old'}`} />
                 <span>{selectedVersion?.label ?? `v${selectedVersion?.versionNumber ?? '?'}`}</span>
                 {selectedVersion?.isCurrent && <span className="bb-version-selector__badge">current</span>}
-                <span className="bb-version-selector__chevron">v</span>
+                <ChevronDown size={14} strokeWidth={1.75} className="bb-version-selector__chevron" />
               </button>
 
               {versionDropdownOpen && (
@@ -237,10 +241,8 @@ export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selecte
               <button
                 type="button"
                 onClick={async () => {
-                  // Restore: publish this old version's schema as a new version
-                  await handlePublish()
-                  setVersionMeta(null, false)
-                  onRestoreVersion()
+                  const success = await handlePublish()
+                  if (success) onRestoreVersion()
                 }}
                 disabled={notification?.status === 'publishing' || !activeBlock}
                 className="bb-btn bb-btn--warning"
@@ -284,7 +286,7 @@ export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selecte
               <p className="bb-notify__title">{notification.msg}</p>
               <p className="bb-notify__sub">The block definition and version have been saved.</p>
             </div>
-            <button className="bb-notify__close" onClick={() => setNotification(null)}>x</button>
+            <button className="bb-notify__close" onClick={() => setNotification(null)}><X size={12} strokeWidth={2} /></button>
           </div>
         </div>
       )}
@@ -302,7 +304,7 @@ export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selecte
                 ))}
               </ul>
             </div>
-            <button className="bb-notify__close" onClick={() => setNotification(null)}>x</button>
+            <button className="bb-notify__close" onClick={() => setNotification(null)}><X size={12} strokeWidth={2} /></button>
           </div>
         </div>
       )}

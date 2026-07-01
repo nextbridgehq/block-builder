@@ -1,6 +1,7 @@
 ﻿'use client'
 
 import React from 'react'
+import { Copy, Trash2, Plus } from 'lucide-react'
 import { useBuilderStore } from '../../store/builder.store'
 
 export function BlockList() {
@@ -16,7 +17,7 @@ export function BlockList() {
       <div className="bb-sidebar__header">
         <span className="bb-sidebar__title">Blocks</span>
         <button type="button" onClick={addBlock} title="Add block" className="bb-sidebar__add">
-          +
+          <Plus size={14} strokeWidth={2} />
         </button>
       </div>
 
@@ -46,7 +47,7 @@ export function BlockList() {
                   className="bb-block-action"
                   title="Duplicate"
                 >
-                  =
+                  <Copy size={12} strokeWidth={1.75} />
                 </button>
                 <button
                   type="button"
@@ -54,7 +55,7 @@ export function BlockList() {
                   className="bb-block-action bb-block-action--danger"
                   title="Delete"
                 >
-                  x
+                  <Trash2 size={12} strokeWidth={1.75} />
                 </button>
               </div>
             </div>

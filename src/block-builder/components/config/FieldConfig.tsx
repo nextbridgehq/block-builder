@@ -5,9 +5,8 @@ import { useBuilderStore } from '../../store/builder.store'
 import type { FieldDefinition, FieldType } from '../../types'
 
 const ALL_TYPES: FieldType[] = [
-  'text', 'textarea', 'richText', 'number', 'checkbox', 'select', 'radio',
-  'date', 'upload', 'email', 'code', 'point', 'relationship', 'array',
-  'group', 'json', 'ui',
+  'text', 'textarea', 'number', 'email', 'date', 'checkbox',
+  'select', 'radio', 'upload', 'relationship', 'json',
 ]
 
 export function FieldConfig() {

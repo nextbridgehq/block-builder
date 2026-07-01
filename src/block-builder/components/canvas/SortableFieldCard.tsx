@@ -3,27 +3,26 @@
 import React from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import {
+  Type, AlignLeft, Hash, Mail, Calendar, CheckSquare,
+  ChevronDown, Circle, Upload, Link, Braces, X,
+  type LucideIcon,
+} from 'lucide-react'
 import { useBuilderStore } from '../../store/builder.store'
 import type { FieldDefinition } from '../../types'
 
-const ICON_MAP: Record<string, string> = {
-  text: 'T',
-  textarea: 'Tx',
-  richText: 'RT',
-  number: '#',
-  checkbox: '[x]',
-  select: 'v',
-  radio: '(o)',
-  date: 'D',
-  upload: '^',
-  email: '@',
-  code: '<>',
-  point: 'P',
-  relationship: '->>',
-  array: '[]',
-  group: '{ }',
-  json: '{ }',
-  ui: 'UI',
+const ICON_MAP: Record<string, LucideIcon> = {
+  text:         Type,
+  textarea:     AlignLeft,
+  number:       Hash,
+  email:        Mail,
+  date:         Calendar,
+  checkbox:     CheckSquare,
+  select:       ChevronDown,
+  radio:        Circle,
+  upload:       Upload,
+  relationship: Link,
+  json:         Braces,
 }
 
 type Props = {
@@ -40,6 +39,7 @@ export function SortableFieldCard({ field, blockId, index }: Props) {
   const activeFieldId = useBuilderStore((s) => s.activeFieldId)
   const setActiveField = useBuilderStore((s) => s.setActiveField)
   const removeField = useBuilderStore((s) => s.removeField)
+  const isReadOnly = useBuilderStore((s) => s.isReadOnly)
 
   const isActive = activeFieldId === field.id
 
@@ -61,7 +61,7 @@ export function SortableFieldCard({ field, blockId, index }: Props) {
         onClick={() => setActiveField(isActive ? null : field.id)}
       >
         <span className="bb-field-card__icon">
-          {ICON_MAP[field.type] ?? '?'}
+          <FieldIcon type={field.type} />
         </span>
 
         <div className="bb-field-card__body">
@@ -76,19 +76,26 @@ export function SortableFieldCard({ field, blockId, index }: Props) {
 
         <span className="bb-field-card__index">#{index + 1}</span>
 
-        <button
-          type="button"
-          onPointerDown={(e) => e.stopPropagation()}
-          onClick={(e) => {
-            e.stopPropagation()
-            removeField(blockId, field.id)
-          }}
-          className="bb-field-card__delete"
-          title="Remove field"
-        >
-          x
-        </button>
+        {!isReadOnly && (
+          <button
+            type="button"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation()
+              removeField(blockId, field.id)
+            }}
+            className="bb-field-card__delete"
+            title="Remove field"
+          >
+            <X size={12} strokeWidth={2} />
+          </button>
+        )}
       </div>
     </div>
   )
+}
+
+function FieldIcon({ type }: { type: string }) {
+  const Icon = ICON_MAP[type]
+  return Icon ? <Icon size={13} strokeWidth={1.75} /> : null
 }

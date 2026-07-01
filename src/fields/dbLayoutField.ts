@@ -15,18 +15,23 @@ export function dbLayoutField(fieldName: string = 'dbLayout', tabLabel: string =
         },
         fields: [
           {
-            name: 'blockDefinition',
-            type: 'relationship',
-            relationTo: 'block-definitions',
-            required: true,
-            admin: { description: 'Which block type to use.' },
-          },
-          {
-            name: 'blockVersion',
-            type: 'relationship',
-            relationTo: 'block-definition-versions',
-            required: true,
-            admin: { description: 'Which schema version to use.' },
+            type: 'row',
+            fields: [
+              {
+                name: 'blockDefinition',
+                type: 'relationship',
+                relationTo: 'block-definitions',
+                required: true,
+                admin: { description: 'Which block type to use.', width: '50%' },
+              },
+              {
+                name: 'blockVersion',
+                type: 'relationship',
+                relationTo: 'block-definition-versions',
+                required: true,
+                admin: { description: 'Which schema version to use.', width: '50%' },
+              },
+            ],
           },
           {
             name: 'instanceId',

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import {
-  Type, AlignLeft, Hash, Mail, Calendar, CheckSquare,
+  Type, AlignLeft, AlignJustify, Hash, Mail, Calendar, CheckSquare,
   ChevronDown, Circle, Upload, Link, List,
   Folder, Braces,
   type LucideIcon,
@@ -12,7 +12,7 @@ import { useBuilderStore } from '../../store/builder.store'
 import type { FieldType } from '../../types'
 
 const ICON_MAP: Record<string, LucideIcon> = {
-  Type, AlignLeft, Hash, Mail, Calendar, CheckSquare,
+  Type, AlignLeft, AlignJustify, Hash, Mail, Calendar, CheckSquare,
   ChevronDown, Circle, Upload, Link, List,
   Folder, Braces,
 }

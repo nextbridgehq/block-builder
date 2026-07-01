@@ -5,6 +5,10 @@ import type { RawFieldInput } from "../../builder/types";
 const REVERSE_TYPE_MAP: Record<string, FieldType> = {
   richtext: "richText",
   image: "upload",
+  file: "upload",        // file and image both map to upload in the builder
+  multiselect: "select", // builder has no multiselect — nearest equivalent
+  url: "text",           // builder has no url field — falls back to text
+  color: "text",         // builder has no color field — falls back to text
 };
 
 const VALID_BUILDER_TYPES = new Set<FieldType>([
@@ -16,9 +20,11 @@ const VALID_BUILDER_TYPES = new Set<FieldType>([
 function fieldToBuilderField(raw: RawFieldInput): FieldDefinition {
   const rawType = String(raw.type ?? "text");
   const mappedType = REVERSE_TYPE_MAP[rawType] ?? rawType;
-  const fieldType: FieldType = VALID_BUILDER_TYPES.has(mappedType as FieldType)
-    ? (mappedType as FieldType)
-    : "text";
+  const isKnown = VALID_BUILDER_TYPES.has(mappedType as FieldType)
+  if (!isKnown) {
+    console.warn(`[block-builder] Unknown field type "${rawType}" — rendering as "text". Add a mapping in REVERSE_TYPE_MAP.`)
+  }
+  const fieldType: FieldType = isKnown ? (mappedType as FieldType) : "text";
 
   const field: FieldDefinition = {
     id: uuidv4(),
@@ -72,7 +78,7 @@ function slugToInterfaceName(slug: string): string {
 
 export function schemaToBuilderBlock(
   slug: string,
-  name: string,
+  _name: string,
   labels: { singular?: string; plural?: string },
   schemaFields: RawFieldInput[]
 ): BlockDefinition {

@@ -57,7 +57,7 @@ function MediaPicker({ label, required, value, onChange }: MediaPickerProps) {
         {mediaId ? (
           <div className="bdf-upload-selected">
             {media?.url ? (
-              <img src={media.url as string} alt={media.alt as string ?? ''} className="bdf-thumb" />
+              <img src={media.url as string} alt={(media.alt as string | null | undefined) ?? ''} className="bdf-thumb" />
             ) : (
               <div className="bdf-thumb-placeholder">[img]</div>
             )}
@@ -81,6 +81,98 @@ function MediaPicker({ label, required, value, onChange }: MediaPickerProps) {
         ) : (
           <ListDrawerToggler className="bdf-upload-btn">
             Choose from Media Library
+          </ListDrawerToggler>
+        )}
+      </div>
+
+      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+      <ListDrawer onSelect={handleSelect as any} />
+    </div>
+  )
+}
+
+// ─── RelationshipPicker ───────────────────────────────────────────────────────
+
+interface RelationshipPickerProps {
+  label: string
+  required?: boolean
+  collection: string
+  value: unknown
+  onChange: (val: unknown) => void
+}
+
+function RelationshipPicker({ label, required, collection, value, onChange }: RelationshipPickerProps) {
+  const changeRef = useRef(onChange)
+  const closeRef = useRef<() => void>(() => {})
+  useEffect(() => { changeRef.current = onChange })
+
+  const handleSelect = useCallback(
+    ({ docID, doc }: { docID: string; doc: Record<string, unknown> }) => {
+      changeRef.current({
+        id: docID,
+        title: doc?.title ?? doc?.name ?? doc?.slug ?? null,
+      })
+      closeRef.current()
+    },
+    [],
+  )
+
+  const [ListDrawer, ListDrawerToggler, { closeDrawer }] = useListDrawer({
+    collectionSlugs: [collection],
+  })
+  closeRef.current = closeDrawer
+
+  const relObj = value && typeof value === 'object' ? (value as Record<string, unknown>) : null
+  const relId = relObj?.id ?? (typeof value === 'string' || typeof value === 'number' ? value : null)
+  const relTitle = relObj?.title ? String(relObj.title) : null
+
+  const [fetchedTitle, setFetchedTitle] = useState<string | null>(null)
+  useEffect(() => {
+    if (!relId || relTitle) { setFetchedTitle(null); return }
+    fetch(`/api/${collection}/${String(relId)}?depth=0`, { credentials: 'same-origin' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((doc: Record<string, unknown> | null) => {
+        if (doc) {
+          const t = doc.title ?? doc.name ?? doc.slug ?? null
+          setFetchedTitle(t ? String(t) : null)
+        }
+      })
+      .catch(() => {})
+  }, [relId, relTitle, collection])
+
+  const displayTitle = relTitle ?? fetchedTitle
+
+  return (
+    <div className="bdf-field">
+      <label className="bdf-label">
+        {label}
+        {required && <span className="bdf-required">*</span>}
+        <span style={{ marginLeft: 6, fontSize: 11, color: 'var(--theme-elevation-400)', fontWeight: 400 }}>
+          ({collection})
+        </span>
+      </label>
+
+      <div className="bdf-upload-area">
+        {relId ? (
+          <div className="bdf-upload-selected">
+            <span className="bdf-upload-name">
+              {displayTitle ?? `ID: ${String(relId)}`}
+            </span>
+            <div className="bdf-upload-actions">
+              <ListDrawerToggler className="bdf-upload-btn">Change</ListDrawerToggler>
+              <button
+                type="button"
+                className="bdf-icon-btn bdf-icon-btn--danger"
+                title="Remove"
+                onClick={() => onChange(null)}
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        ) : (
+          <ListDrawerToggler className="bdf-upload-btn">
+            Choose from {collection}
           </ListDrawerToggler>
         )}
       </div>
@@ -325,27 +417,18 @@ function FieldInput({ field, value, onChange }: FieldInputProps) {
         />
       )
 
-    case 'relationship':
+    case 'relationship': {
+      const collection = (field as unknown as { collection?: string }).collection ?? 'media'
       return (
-        <div className="bdf-field">
-          <label className="bdf-label">
-            {label}
-            {field.required && <span className="bdf-required">*</span>}
-            {(field as unknown as { collection?: string }).collection && (
-              <span style={{ marginLeft: 6, fontSize: 11, color: 'var(--theme-elevation-400)', fontWeight: 400 }}>
-                ({(field as unknown as { collection?: string }).collection})
-              </span>
-            )}
-          </label>
-          <input
-            className="bdf-input"
-            type="text"
-            value={(value as string) ?? ''}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder="Enter document ID"
-          />
-        </div>
+        <RelationshipPicker
+          label={label}
+          required={field.required}
+          collection={collection}
+          value={value}
+          onChange={onChange}
+        />
       )
+    }
 
     case 'json':
       return (
