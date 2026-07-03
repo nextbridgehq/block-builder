@@ -93,89 +93,168 @@ function MediaPicker({ label, required, value, onChange }: MediaPickerProps) {
 
 // ─── RelationshipPicker ───────────────────────────────────────────────────────
 
+type RelDoc = { id: string | number; title: string | null }
+
 interface RelationshipPickerProps {
   label: string
   required?: boolean
   collection: string
+  hasMany?: boolean
   value: unknown
   onChange: (val: unknown) => void
 }
 
-function RelationshipPicker({ label, required, collection, value, onChange }: RelationshipPickerProps) {
+function toRelDoc(v: unknown): RelDoc | null {
+  if (!v) return null
+  if (typeof v === 'object') {
+    const o = v as Record<string, unknown>
+    if (!o.id) return null
+    return { id: o.id as string | number, title: o.title ? String(o.title) : null }
+  }
+  if (typeof v === 'string' || typeof v === 'number') return { id: v, title: null }
+  return null
+}
+
+function RelationshipPicker({ label, required, collection, hasMany = false, value, onChange }: RelationshipPickerProps) {
   const changeRef = useRef(onChange)
   const closeRef = useRef<() => void>(() => {})
   useEffect(() => { changeRef.current = onChange })
 
+  const items: RelDoc[] = hasMany
+    ? (Array.isArray(value) ? (value as unknown[]).map(toRelDoc).filter(Boolean) as RelDoc[] : [])
+    : (() => { const d = toRelDoc(value); return d ? [d] : [] })()
+
+  const itemsRef = useRef<RelDoc[]>(items)
+  useEffect(() => { itemsRef.current = items })
+
   const handleSelect = useCallback(
     ({ docID, doc }: { docID: string; doc: Record<string, unknown> }) => {
-      changeRef.current({
-        id: docID,
-        title: doc?.title ?? doc?.name ?? doc?.slug ?? null,
-      })
-      closeRef.current()
+      const title = String(doc?.title ?? doc?.name ?? doc?.slug ?? '') || null
+      const entry: RelDoc = { id: docID, title }
+      if (hasMany) {
+        const alreadyExists = itemsRef.current.some((i) => String(i.id) === String(docID))
+        if (!alreadyExists) changeRef.current([...itemsRef.current, entry])
+      } else {
+        changeRef.current(entry)
+        closeRef.current()
+      }
     },
-    [],
+    [hasMany],
   )
 
-  const [ListDrawer, ListDrawerToggler, { closeDrawer }] = useListDrawer({
+  const [ListDrawer, ListDrawerToggler, { closeDrawer, openDrawer }] = useListDrawer({
     collectionSlugs: [collection],
   })
   closeRef.current = closeDrawer
 
-  const relObj = value && typeof value === 'object' ? (value as Record<string, unknown>) : null
-  const relId = relObj?.id ?? (typeof value === 'string' || typeof value === 'number' ? value : null)
-  const relTitle = relObj?.title ? String(relObj.title) : null
-
-  const [fetchedTitle, setFetchedTitle] = useState<string | null>(null)
+  const [fetchedTitles, setFetchedTitles] = useState<Record<string, string>>({})
+  const fetchingRef = useRef<Set<string>>(new Set())
   useEffect(() => {
-    if (!relId || relTitle) { setFetchedTitle(null); return }
-    fetch(`/api/${collection}/${String(relId)}?depth=0`, { credentials: 'same-origin' })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((doc: Record<string, unknown> | null) => {
-        if (doc) {
-          const t = doc.title ?? doc.name ?? doc.slug ?? null
-          setFetchedTitle(t ? String(t) : null)
-        }
-      })
-      .catch(() => {})
-  }, [relId, relTitle, collection])
+    const missing = items.filter(
+      (i) => !i.title && !fetchedTitles[String(i.id)] && !fetchingRef.current.has(String(i.id)),
+    )
+    if (missing.length === 0) return
+    missing.forEach((item) => {
+      const idStr = String(item.id)
+      fetchingRef.current.add(idStr)
+      fetch(`/api/${collection}/${idStr}?depth=0`, { credentials: 'same-origin' })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((doc: Record<string, unknown> | null) => {
+          if (doc) {
+            const t = doc.title ?? doc.name ?? doc.slug ?? null
+            if (t) setFetchedTitles((prev) => ({ ...prev, [idStr]: String(t) }))
+          }
+        })
+        .catch(() => { fetchingRef.current.delete(idStr) })
+    })
+  }, [items, collection])
 
-  const displayTitle = relTitle ?? fetchedTitle
+  function getTitle(item: RelDoc) {
+    return item.title ?? fetchedTitles[String(item.id)] ?? `ID: ${String(item.id)}`
+  }
+
+  function clearOne(e: React.MouseEvent, id: string | number) {
+    e.stopPropagation()
+    if (hasMany) onChange(items.filter((i) => String(i.id) !== String(id)))
+    else onChange(null)
+  }
 
   return (
     <div className="bdf-field">
       <label className="bdf-label">
         {label}
         {required && <span className="bdf-required">*</span>}
-        <span style={{ marginLeft: 6, fontSize: 11, color: 'var(--theme-elevation-400)', fontWeight: 400 }}>
-          ({collection})
-        </span>
       </label>
 
-      <div className="bdf-upload-area">
-        {relId ? (
-          <div className="bdf-upload-selected">
-            <span className="bdf-upload-name">
-              {displayTitle ?? `ID: ${String(relId)}`}
-            </span>
-            <div className="bdf-upload-actions">
-              <ListDrawerToggler className="bdf-upload-btn">Change</ListDrawerToggler>
+      <div className={`bdf-rel${hasMany ? ' bdf-rel--multi' : ''}`}>
+        {/* Main clickable control */}
+        <div
+          role="button"
+          tabIndex={0}
+          className="bdf-rel__control"
+          onClick={openDrawer}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrawer() }}
+        >
+          <div className="bdf-rel__values">
+            {items.length === 0 && (
+              <span className="bdf-rel__placeholder">Select a value...</span>
+            )}
+
+            {/* Single value */}
+            {!hasMany && items.length > 0 && (
+              <span className="bdf-rel__single">{getTitle(items[0])}</span>
+            )}
+
+            {/* hasMany chips */}
+            {hasMany && items.map((item) => (
+              <span key={String(item.id)} className="bdf-rel__chip">
+                <span className="bdf-rel__chip-label">{getTitle(item)}</span>
+                <button
+                  type="button"
+                  className="bdf-rel__chip-remove"
+                  onClick={(e) => clearOne(e, item.id)}
+                  aria-label={`Remove ${getTitle(item)}`}
+                >
+                  <svg height="12" width="12" viewBox="0 0 20 20" aria-hidden="true" focusable="false" fill="currentColor">
+                    <path d="M14.348 14.849c-0.469 0.469-1.229 0.469-1.697 0l-2.651-3.030-2.651 3.029c-0.469 0.469-1.229 0.469-1.697 0-0.469-0.469-0.469-1.229 0-1.697l2.758-3.15-2.759-3.152c-0.469-0.469-0.469-1.228 0-1.697s1.228-0.469 1.697 0l2.652 3.031 2.651-3.031c0.469-0.469 1.228-0.469 1.697 0s0.469 1.229 0 1.697l-2.758 3.152 2.758 3.15c0.469 0.469 0.469 1.229 0 1.698z" />
+                  </svg>
+                </button>
+              </span>
+            ))}
+          </div>
+
+          {/* Right-side indicators */}
+          <div className="bdf-rel__indicators">
+            {!hasMany && items.length > 0 && (
               <button
                 type="button"
-                className="bdf-icon-btn bdf-icon-btn--danger"
-                title="Remove"
-                onClick={() => onChange(null)}
+                className="bdf-rel__clear"
+                onClick={(e) => clearOne(e, items[0].id)}
+                aria-label="Clear"
               >
-                ×
+                <svg height="16" width="16" viewBox="0 0 20 20" aria-hidden="true" focusable="false" fill="currentColor">
+                  <path d="M14.348 14.849c-0.469 0.469-1.229 0.469-1.697 0l-2.651-3.030-2.651 3.029c-0.469 0.469-1.229 0.469-1.697 0-0.469-0.469-0.469-1.229 0-1.697l2.758-3.15-2.759-3.152c-0.469-0.469-0.469-1.228 0-1.697s1.228-0.469 1.697 0l2.652 3.031 2.651-3.031c0.469-0.469 1.228-0.469 1.697 0s0.469 1.229 0 1.697l-2.758 3.152 2.758 3.15c0.469 0.469 0.469 1.229 0 1.698z" />
+                </svg>
               </button>
-            </div>
+            )}
+            <span className="bdf-rel__sep" />
+            <span className="bdf-rel__chevron">
+              <svg height="16" width="16" viewBox="0 0 20 20" aria-hidden="true" focusable="false" fill="currentColor">
+                <path d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z" />
+              </svg>
+            </span>
           </div>
-        ) : (
-          <ListDrawerToggler className="bdf-upload-btn">
-            Choose from {collection}
+        </div>
+
+        {/* hasMany: + Add button outside control (like Payload's AddNewRelation) */}
+        {hasMany && (
+          <ListDrawerToggler className="bdf-rel__add" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+            +
           </ListDrawerToggler>
         )}
       </div>
+
+      <span className="bdf-rel__hint">{collection}{hasMany ? ' · multiple' : ''}</span>
 
       {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
       <ListDrawer onSelect={handleSelect as any} />
@@ -183,7 +262,54 @@ function RelationshipPicker({ label, required, collection, value, onChange }: Re
   )
 }
 
-// â"€â"€â"€ SchemaForm â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// â"€â"€// JsonField
+
+interface JsonFieldProps {
+  label: string
+  required?: boolean
+  value: unknown
+  onChange: (val: unknown) => void
+}
+
+function JsonField({ label, required, value, onChange }: JsonFieldProps) {
+  const [text, setText] = useState(() =>
+    value !== undefined ? JSON.stringify(value, null, 2) : '',
+  )
+  const [hasError, setHasError] = useState(false)
+
+  return (
+    <div className="bdf-field">
+      <label className="bdf-label">
+        {label}
+        {required && <span className="bdf-required">*</span>}
+        <span style={{ marginLeft: 6, fontSize: 11, color: 'var(--theme-elevation-400)', fontWeight: 400 }}>
+          (JSON)
+        </span>
+      </label>
+      <textarea
+        className="bdf-input bdf-textarea bdf-mono"
+        value={text}
+        rows={4}
+        onChange={(e) => {
+          setText(e.target.value)
+          try {
+            onChange(JSON.parse(e.target.value))
+            setHasError(false)
+          } catch {
+            setHasError(true)
+          }
+        }}
+      />
+      {hasError && (
+        <div className="bdf-error" style={{ marginTop: 4 }}>
+          Invalid JSON — changes not saved until fixed.
+        </div>
+      )}
+    </div>
+  )
+}
+
+// â"€ SchemaForm â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 interface SchemaFormProps {
   schema: BlockFieldDefinition[]
@@ -234,7 +360,7 @@ function FieldInput({ field, value, onChange }: FieldInputProps) {
           </label>
           <input
             className="bdf-input"
-            type={field.type === 'email' ? 'email' : 'text'}
+            type={field.type === 'email' ? 'email' : field.type === 'url' ? 'url' : 'text'}
             value={(value as string) ?? ''}
             onChange={(e) => onChange(e.target.value)}
           />
@@ -315,7 +441,7 @@ function FieldInput({ field, value, onChange }: FieldInputProps) {
             type="number"
             value={numVal}
             onChange={(e) =>
-              onChange(e.target.value === '' ? undefined : e.target.valueAsNumber)
+              onChange(e.target.value === '' ? null : e.target.valueAsNumber)
             }
           />
         </div>
@@ -418,12 +544,23 @@ function FieldInput({ field, value, onChange }: FieldInputProps) {
       )
 
     case 'relationship': {
-      const collection = (field as unknown as { collection?: string }).collection ?? 'media'
+      const relField = field as unknown as { collection?: string; hasMany?: boolean }
+      if (!relField.collection) {
+        return (
+          <div className="bdf-field">
+            <label className="bdf-label">{label}</label>
+            <div className="bdf-error">
+              Relationship field <strong>{field.name}</strong> has no <code>collection</code> defined in its schema.
+            </div>
+          </div>
+        )
+      }
       return (
         <RelationshipPicker
           label={label}
           required={field.required}
-          collection={collection}
+          collection={relField.collection}
+          hasMany={relField.hasMany ?? false}
           value={value}
           onChange={onChange}
         />
@@ -431,25 +568,7 @@ function FieldInput({ field, value, onChange }: FieldInputProps) {
     }
 
     case 'json':
-      return (
-        <div className="bdf-field">
-          <label className="bdf-label">
-            {label}
-            {field.required && <span className="bdf-required">*</span>}
-            <span style={{ marginLeft: 6, fontSize: 11, color: 'var(--theme-elevation-400)', fontWeight: 400 }}>
-              (JSON)
-            </span>
-          </label>
-          <textarea
-            className="bdf-input bdf-textarea bdf-mono"
-            value={value !== undefined ? JSON.stringify(value, null, 2) : ''}
-            rows={4}
-            onChange={(e) => {
-              try { onChange(JSON.parse(e.target.value)) } catch { /* allow partial edits */ }
-            }}
-          />
-        </div>
-      )
+      return <JsonField label={label} required={field.required} value={value} onChange={onChange} />
 
     case 'array': {
       const rows = Array.isArray(value) ? (value as Record<string, unknown>[]) : []

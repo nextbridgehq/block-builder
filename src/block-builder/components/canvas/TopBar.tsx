@@ -5,13 +5,7 @@ import { Blocks, ChevronDown, X } from 'lucide-react'
 import { useBuilderStore } from '../../store/builder.store'
 import { mapToSaveRequest } from '../../lib/mapToSaveRequest'
 import { generateAllBlocks, generateIndexFile } from '../../lib/codegen'
-import type { VersionInfo, BlockDefInfo } from './BuilderShell'
-
-type NotificationState =
-  | { status: 'publishing' }
-  | { status: 'success'; msg: string }
-  | { status: 'error'; title: string; errors: string[] }
-  | null
+import type { VersionInfo, BlockDefInfo, NotificationState } from './BuilderShell'
 
 type Props = {
   blockDefs: BlockDefInfo[]
@@ -22,9 +16,11 @@ type Props = {
   onVersionSelect: (versionId: string) => void
   onRestoreVersion: () => void
   onAfterPublish: () => void
+  notification: NotificationState
+  onSetNotification: (n: NotificationState) => void
 }
 
-export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selectedVersionId, onVersionSelect, onRestoreVersion, onAfterPublish }: Props) {
+export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selectedVersionId, onVersionSelect, onRestoreVersion, onAfterPublish, notification, onSetNotification }: Props) {
   const blocks = useBuilderStore((s) => s.blocks)
   const activeBlockId = useBuilderStore((s) => s.activeBlockId)
   const activeBlock = blocks.find((b) => b.id === activeBlockId)
@@ -33,7 +29,7 @@ export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selecte
   const isReadOnly = useBuilderStore((s) => s.isReadOnly)
   const setVersionMeta = useBuilderStore((s) => s.setVersionMeta)
 
-  const [notification, setNotification] = useState<NotificationState>(null)
+  const setNotification = onSetNotification
   const [versionDropdownOpen, setVersionDropdownOpen] = useState(false)
   const [blockPickerOpen, setBlockPickerOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)

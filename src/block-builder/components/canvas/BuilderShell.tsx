@@ -19,6 +19,12 @@ export type VersionInfo = {
   isCurrent: boolean
 }
 
+export type NotificationState =
+  | { status: 'publishing' }
+  | { status: 'success'; msg: string }
+  | { status: 'error'; title: string; errors: string[] }
+  | null
+
 export type BlockDefInfo = {
   id: string
   slug: string
@@ -37,7 +43,7 @@ export function BuilderShell({ loadSlug }: Props) {
 
   const [activeSlug, setActiveSlug] = useState<string | null>(loadSlug ?? null)
   const [loading, setLoading] = useState(!!loadSlug)
-  const [loadError, setLoadError] = useState<string | null>(null)
+  const [notification, setNotification] = useState<NotificationState>(null)
   const [showCodePreview, setShowCodePreview] = useState(false)
   const [versions, setVersions] = useState<VersionInfo[]>([])
   const [selectedVersionId, setSelectedVersionId] = useState<string | null>(null)
@@ -55,7 +61,7 @@ export function BuilderShell({ loadSlug }: Props) {
       })
       .catch((err: unknown) => {
         console.error('[block-builder] Failed to load block definitions:', err)
-        setLoadError('Could not load block definitions. Please refresh the page.')
+        setNotification({ status: 'error', title: 'Failed to load block definitions', errors: ['Could not load block definitions. Please refresh the page.'] })
       })
   }, [])
 
@@ -71,7 +77,7 @@ export function BuilderShell({ loadSlug }: Props) {
 
   const loadVersion = useCallback(async (slug: string, versionId?: string) => {
     setLoading(true)
-    setLoadError(null)
+    setNotification(null)
     const url = versionId
       ? `/api/block-builder/load/${encodeURIComponent(slug)}?versionId=${encodeURIComponent(versionId)}`
       : `/api/block-builder/load/${encodeURIComponent(slug)}`
@@ -89,10 +95,10 @@ export function BuilderShell({ loadSlug }: Props) {
         setVersionMeta(json.versionId ?? null, !(json.isCurrent ?? true))
         setSelectedVersionId(json.versionId ?? null)
       } else {
-        setLoadError(json.error ?? 'Failed to load block')
+        setNotification({ status: 'error', title: 'Failed to load block', errors: [json.error ?? 'Unknown error'] })
       }
     } catch (err) {
-      setLoadError(err instanceof Error ? err.message : 'Network error')
+      setNotification({ status: 'error', title: 'Network error', errors: [err instanceof Error ? err.message : 'Could not reach the server.'] })
     } finally {
       setLoading(false)
     }
@@ -104,7 +110,7 @@ export function BuilderShell({ loadSlug }: Props) {
     setBlockSlug(slug)
     setVersions([])
     setSelectedVersionId(null)
-    setLoadError(null)
+    setNotification(null)
     setMobilePanelTab('canvas')
 
     await loadVersion(slug)
@@ -155,14 +161,12 @@ export function BuilderShell({ loadSlug }: Props) {
         onVersionSelect={handleVersionSelect}
         onRestoreVersion={handleRestoreVersion}
         onAfterPublish={handleAfterPublish}
+        notification={notification}
+        onSetNotification={setNotification}
       />
 
       {loading && (
         <div className="bb-loading-bar">Loading...</div>
-      )}
-
-      {loadError && (
-        <div className="bb-error-bar">Error: {loadError}</div>
       )}
 
       {isReadOnly && !loading && (
@@ -182,7 +186,7 @@ export function BuilderShell({ loadSlug }: Props) {
       )}
 
       <div className="bb-main" data-mobile-panel={mobilePanelTab}>
-        <BlockList />
+        <BlockList blockDefs={blockDefs} activeSlug={activeSlug} onBlockSelect={loadBlockBySlug} />
         <div className="bb-main__center">
           <FieldPalette />
           <BuilderCanvas />

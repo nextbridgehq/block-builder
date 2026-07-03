@@ -22,13 +22,26 @@ export function dbLayoutField(fieldName: string = 'dbLayout', tabLabel: string =
                 type: 'relationship',
                 relationTo: 'block-definitions',
                 required: true,
-                admin: { description: 'Which block type to use.', width: '50%' },
+                admin: {
+                  description: 'Which block type to use.',
+                  width: '50%',
+                  components: {
+                    afterInput: ['@nextbridgehq/payload-block-builder/client#BlockVersionSync'],
+                  },
+                },
               },
               {
                 name: 'blockVersion',
                 type: 'relationship',
                 relationTo: 'block-definition-versions',
                 required: true,
+                filterOptions: ({ siblingData }) => {
+                  const def = (siblingData as Record<string, unknown>)?.blockDefinition
+                  if (!def) return false
+                  const defId = def && typeof def === 'object' ? (def as Record<string, unknown>).id : def
+                  if (!defId) return false
+                  return { blockDefinition: { equals: defId } }
+                },
                 admin: { description: 'Which schema version to use.', width: '50%' },
               },
             ],
