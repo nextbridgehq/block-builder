@@ -1,12 +1,9 @@
-﻿import type { PayloadHandler } from 'payload'
+import type { PayloadHandler } from 'payload'
 import type { SaveSchemaRequest } from '../builder/types'
 import { saveSchemaLocally } from '../builder/saveSchema'
+import { withBuilderGuard } from './guard'
 
-export const saveEndpoint: PayloadHandler = async (req) => {
-  if (!req.user) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
+export const saveEndpoint: PayloadHandler = withBuilderGuard(async (req) => {
   let body: SaveSchemaRequest
   try {
     if (!req.json) return Response.json({ error: 'No JSON parser available' }, { status: 500 })
@@ -21,6 +18,4 @@ export const saveEndpoint: PayloadHandler = async (req) => {
 
   const result = await saveSchemaLocally(req.payload, body)
   return Response.json(result, { status: result.success ? 200 : 422 })
-}
-
-
+})

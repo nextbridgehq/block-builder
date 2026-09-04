@@ -1,0 +1,17 @@
+# Normalise line endings on checkin so the repo never accumulates CRLF again.
+* text=auto eol=lf
+
+# Source must stay UTF-8 without BOM. The box-drawing separators in comments and
+# CSS section headers were corrupted twice by editors round-tripping through
+# cp1252; declaring the encoding stops git from re-encoding on checkout.
+*.ts   text eol=lf working-tree-encoding=UTF-8
+*.tsx  text eol=lf working-tree-encoding=UTF-8
+*.css  text eol=lf working-tree-encoding=UTF-8
+*.json text eol=lf
+*.md   text eol=lf
+*.yml  text eol=lf
+
+# Never normalise binaries.
+*.png  binary
+*.jpg  binary
+*.ico  binary

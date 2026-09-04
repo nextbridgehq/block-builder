@@ -1,13 +1,26 @@
-﻿import type { PayloadHandler } from 'payload'
-import { schemaToBuilderBlock } from '../block-builder/lib/schemaToBuilderBlock'
+import type { PayloadHandler } from 'payload'
 import type { BlockSchema } from '../validation/types'
-import type { RawFieldInput } from '../builder/types'
+import type { BlockDefinition, FieldDefinition } from '../block-builder/types'
+import { uuidv4 } from '../utils/uuid'
+import { resolveId } from '../utils/resolveId'
+import { withBuilderGuard } from './guard'
 
-export const loadEndpoint: PayloadHandler = async (req) => {
-  if (!req.user) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+// The persisted `BlockField` schema has no `id` per field (see validation/types.ts
+// BaseField) -- ids are a block-builder UI-only concept used for React keys and
+// drag-and-drop. Assign fresh ones recursively when bridging into `FieldDefinition[]`.
+export function assignFieldIds(fields: unknown): FieldDefinition[] {
+  if (!Array.isArray(fields)) return []
+  return fields.map((field) => {
+    const f = { ...(field as FieldDefinition), id: uuidv4() }
+    if (Array.isArray(f.fields)) f.fields = assignFieldIds(f.fields)
+    if (Array.isArray(f.tabs)) {
+      f.tabs = f.tabs.map((tab) => ({ ...tab, fields: assignFieldIds(tab.fields) }))
+    }
+    return f
+  })
+}
 
+export const loadEndpoint: PayloadHandler = withBuilderGuard(async (req) => {
   const slug = req.routeParams?.slug as string | undefined
   if (!slug) {
     return Response.json({ error: 'Slug is required' }, { status: 400 })
@@ -30,15 +43,7 @@ export const loadEndpoint: PayloadHandler = async (req) => {
     return Response.json({ error: `Block definition "${slug}" not found` }, { status: 404 })
   }
 
-  const name = (def as unknown as { name?: string }).name ?? slug
-
-  // Resolve current version ID for isCurrent flag
-  const currentVersionId =
-    def.currentVersion && typeof def.currentVersion === 'object'
-      ? String((def.currentVersion as { id: unknown }).id)
-      : typeof def.currentVersion === 'string' || typeof def.currentVersion === 'number'
-        ? String(def.currentVersion)
-        : null
+  const currentVersionId = resolveId(def.currentVersion)
 
   let version: Record<string, unknown> | null = null
 
@@ -51,8 +56,11 @@ export const loadEndpoint: PayloadHandler = async (req) => {
         depth: 0,
       })
       version = v as unknown as Record<string, unknown>
-    } catch {
-      return Response.json({ error: `Version "${requestedVersionId}" not found` }, { status: 404 })
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === 'NotFound') {
+        return Response.json({ error: `Version "${requestedVersionId}" not found` }, { status: 404 })
+      }
+      return Response.json({ error: `Failed to load version "${requestedVersionId}"` }, { status: 500 })
     }
   } else if (def.currentVersion && typeof def.currentVersion === 'object') {
     version = def.currentVersion as unknown as Record<string, unknown>
@@ -68,9 +76,13 @@ export const loadEndpoint: PayloadHandler = async (req) => {
     version = (latestResult.docs[0] as unknown as Record<string, unknown>) ?? null
   }
 
-  // No versions exist at all â€" return empty block so builder starts blank
+  function slugToInterfaceName(s: string) {
+    return s.split(/[-_]/).map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join('')
+  }
+
+  // No versions exist at all -- return empty block so builder starts blank
   if (!version) {
-    const block = schemaToBuilderBlock(slug, name, {}, [])
+    const block: BlockDefinition = { id: uuidv4(), slug, interfaceName: slugToInterfaceName(slug), labels: {}, fields: [] }
     return Response.json({ block, versionId: null, versionNumber: null, isCurrent: true })
   }
 
@@ -82,7 +94,13 @@ export const loadEndpoint: PayloadHandler = async (req) => {
   const labels = (version.labels as { singular?: string; plural?: string } | undefined) ?? {}
   const versionNumber = version.versionNumber as number | undefined
 
-  const block = schemaToBuilderBlock(slug, name, labels, schemaFields as unknown as RawFieldInput[])
+  const block: BlockDefinition = {
+    id: uuidv4(),
+    slug,
+    interfaceName: slugToInterfaceName(slug),
+    labels,
+    fields: assignFieldIds(schemaFields),
+  }
 
   return Response.json({
     block,
@@ -90,6 +108,4 @@ export const loadEndpoint: PayloadHandler = async (req) => {
     versionNumber: versionNumber ?? null,
     isCurrent: versionId === currentVersionId,
   })
-}
-
-
+})

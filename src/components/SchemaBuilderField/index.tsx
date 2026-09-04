@@ -1,9 +1,10 @@
-﻿'use client'
+'use client'
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useField } from '@payloadcms/ui'
 import type { FieldType, ConditionRule, ValidationRules, UIMetadata } from '../../validation/types'
 import { FieldRow } from './FieldRow'
+import { ErrorBoundary } from '../../block-builder/components/ErrorBoundary'
 
 export interface FieldDef {
   name: string
@@ -104,6 +105,7 @@ export function SchemaBuilderField({ path, readOnly }: Props) {
   }, [])
 
   return (
+    <ErrorBoundary>
     <div>
       <div className="sbf-section-heading">
         <span className="sbf-section-label">
@@ -154,6 +156,7 @@ export function SchemaBuilderField({ path, readOnly }: Props) {
         </div>
       )}
     </div>
+    </ErrorBoundary>
   )
 }
 

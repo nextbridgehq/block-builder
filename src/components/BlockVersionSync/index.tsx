@@ -31,6 +31,10 @@ export function BlockVersionSync({ path }: { path: string }) {
       return
     }
 
+    if (!/^[a-zA-Z0-9_-]+$/.test(String(defId))) {
+      return
+    }
+
     fetch(`/api/block-definitions/${String(defId)}?depth=1`, { credentials: 'same-origin' })
       .then((r) => (r.ok ? r.json() : null))
       .then((doc: Record<string, unknown> | null) => {
@@ -43,7 +47,9 @@ export function BlockVersionSync({ path }: { path: string }) {
             : currentVersion
         if (versionId) setVersion(versionId)
       })
-      .catch(() => {})
+      .catch((err) => {
+        console.error('[Block Builder] BlockVersionSync fetch error:', err)
+      })
   }, [blockDefValue, setVersion])
 
   return null

@@ -2,10 +2,26 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import { Blocks, ChevronDown, X } from 'lucide-react'
+import { uuidv4 } from '../../../utils/uuid'
 import { useBuilderStore } from '../../store/builder.store'
-import { mapToSaveRequest } from '../../lib/mapToSaveRequest'
-import { generateAllBlocks, generateIndexFile } from '../../lib/codegen'
 import type { VersionInfo, BlockDefInfo, NotificationState } from './BuilderShell'
+import type { FieldDefinition } from '../../types'
+
+// Imported JSON may come from a hand-authored Payload field config, where
+// fields have no `id`. Every field (and nested/tab field) needs a unique id
+// so BuilderCanvas can key its lists correctly.
+function ensureFieldIds(fields: unknown): FieldDefinition[] {
+  if (!Array.isArray(fields)) return []
+  return fields.map((field) => {
+    const f = { ...(field as FieldDefinition) }
+    if (!f.id) f.id = uuidv4()
+    if (Array.isArray(f.fields)) f.fields = ensureFieldIds(f.fields)
+    if (Array.isArray(f.tabs)) {
+      f.tabs = f.tabs.map((tab) => ({ ...tab, fields: ensureFieldIds(tab.fields) }))
+    }
+    return f
+  })
+}
 
 type Props = {
   blockDefs: BlockDefInfo[]
@@ -15,12 +31,14 @@ type Props = {
   selectedVersionId: string | null
   onVersionSelect: (versionId: string) => void
   onRestoreVersion: () => void
-  onAfterPublish: () => void
+  onAfterPublish: (publishedSlug: string) => void
   notification: NotificationState
   onSetNotification: (n: NotificationState) => void
+  previewOpen: boolean
+  onTogglePreview: () => void
 }
 
-export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selectedVersionId, onVersionSelect, onRestoreVersion, onAfterPublish, notification, onSetNotification }: Props) {
+export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selectedVersionId, onVersionSelect, onRestoreVersion, onAfterPublish, notification, onSetNotification, previewOpen, onTogglePreview }: Props) {
   const blocks = useBuilderStore((s) => s.blocks)
   const activeBlockId = useBuilderStore((s) => s.activeBlockId)
   const activeBlock = blocks.find((b) => b.id === activeBlockId)
@@ -28,12 +46,14 @@ export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selecte
   const isDirty = useBuilderStore((s) => s.isDirty)
   const isReadOnly = useBuilderStore((s) => s.isReadOnly)
   const setVersionMeta = useBuilderStore((s) => s.setVersionMeta)
+  const loadBlock = useBuilderStore((s) => s.loadBlock)
 
   const setNotification = onSetNotification
   const [versionDropdownOpen, setVersionDropdownOpen] = useState(false)
   const [blockPickerOpen, setBlockPickerOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const blockPickerRef = useRef<HTMLDivElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const selectedVersion = versions.find((v) => v.id === selectedVersionId)
   const currentVersion = versions.find((v) => v.isCurrent)
@@ -65,10 +85,19 @@ export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selecte
     if (!activeBlock || isReadOnly) return false
     setNotification({ status: 'publishing' })
     try {
-      const req = mapToSaveRequest(activeBlock)
+      const normalizeSlug = (s: string) => s.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+      // The slug the server actually stores under -- the shell needs it to know
+      // which block the version list it is about to refresh belongs to.
+      const publishedSlug = normalizeSlug(activeBlock.slug)
+      const req = {
+        blockSlug: publishedSlug,
+        name: activeBlock.labels?.singular ?? activeBlock.slug,
+        schema: { fields: activeBlock.fields },
+        changelog: "Created via block builder",
+      }
       const res = await fetch('/api/blocks/save', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-Block-Builder': '1' },
         body: JSON.stringify(req),
       })
       const json = await res.json() as {
@@ -84,7 +113,7 @@ export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selecte
           status: 'success',
           msg: `v${json.versionNumber ?? '?'} published successfully!`,
         })
-        onAfterPublish()
+        onAfterPublish(publishedSlug)
         return true
       } else {
         setNotification({
@@ -104,20 +133,41 @@ export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selecte
     }
   }
 
-  function handleExport() {
-    if (blocks.length === 0) return
-    const outputs = [...generateAllBlocks(blocks), generateIndexFile(blocks)]
-    for (const out of outputs) {
-      const blob = new Blob([out.code], { type: 'text/plain' })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = out.filename
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
+  function handleExportJson() {
+    if (!activeBlock) return
+    const blob = new Blob([JSON.stringify(activeBlock, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${activeBlock.slug}-schema.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  function handleImportJson(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      try {
+        const json = JSON.parse(event.target?.result as string)
+        if (json && json.slug && Array.isArray(json.fields)) {
+          // ensure block id and every field id exist and are unique
+          if (!json.id) json.id = uuidv4()
+          json.fields = ensureFieldIds(json.fields)
+          loadBlock(json)
+          setNotification({ status: 'success', msg: 'Block imported successfully!' })
+        } else {
+          setNotification({ status: 'error', title: 'Invalid JSON', errors: ['The file does not contain a valid block schema.'] })
+        }
+      } catch (err) {
+        setNotification({ status: 'error', title: 'Parse Error', errors: ['Could not parse JSON file.'] })
+      }
     }
+    reader.readAsText(file)
+    if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
   function formatDate(iso: string) {
@@ -214,14 +264,38 @@ export function TopBar({ blockDefs, activeSlug, onBlockSelect, versions, selecte
         </div>
 
         <div className="bb-topbar__actions">
+          <input
+            type="file"
+            accept=".json"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            onChange={handleImportJson}
+          />
           <button
             type="button"
-            onClick={handleExport}
-            disabled={blocks.length === 0}
+            onClick={() => fileInputRef.current?.click()}
             className="bb-btn bb-btn--secondary"
-            style={{ display: 'none' }}
           >
-            Export .ts
+            Import JSON
+          </button>
+          <button
+            type="button"
+            onClick={handleExportJson}
+            disabled={!activeBlock}
+            className="bb-btn bb-btn--secondary"
+          >
+            Export JSON
+          </button>
+
+          <div style={{ width: 1, height: 24, background: 'var(--bb-border)', margin: '0 4px' }} />
+
+          <button
+            type="button"
+            onClick={onTogglePreview}
+            disabled={!activeBlock}
+            className={`bb-btn ${previewOpen ? 'bb-btn--primary' : 'bb-btn--secondary'}`}
+          >
+            {previewOpen ? 'Close Preview' : 'Live Preview'}
           </button>
 
           {isReadOnly ? (

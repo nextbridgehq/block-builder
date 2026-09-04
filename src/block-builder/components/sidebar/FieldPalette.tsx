@@ -1,10 +1,10 @@
-﻿'use client'
+'use client'
 
 import React, { useState } from 'react'
 import {
   Type, AlignLeft, AlignJustify, Hash, Mail, Calendar, CheckSquare,
   ChevronDown, Circle, Upload, Link, List,
-  Folder, Braces,
+  Folder, Braces, Image, Box, Columns,
   type LucideIcon,
 } from 'lucide-react'
 import { FIELD_PALETTE, FIELD_CATEGORIES, getFieldMeta } from '../../lib/field-palette'
@@ -14,7 +14,7 @@ import type { FieldType } from '../../types'
 const ICON_MAP: Record<string, LucideIcon> = {
   Type, AlignLeft, AlignJustify, Hash, Mail, Calendar, CheckSquare,
   ChevronDown, Circle, Upload, Link, List,
-  Folder, Braces,
+  Folder, Braces, Image, Box, Columns,
 }
 
 export function FieldPalette() {

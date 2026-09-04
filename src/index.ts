@@ -1,15 +1,15 @@
-﻿// â"€â"€ Plugin â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Plugin ────────────────────────────────────────────────────────────────────
 export { dynamicBlocksPlugin } from './plugin'
 export type { DynamicBlocksPluginOptions } from './plugin'
 
-// â"€â"€ Field factory â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Field factory ─────────────────────────────────────────────────────────────
 export { dbLayoutField } from './fields/dbLayoutField'
 
-// â"€â"€ Collections (for consumers who want to register manually) â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ── Collections (for consumers who want to register manually) ─────────────────
 export { BlockDefinitions } from './collections/BlockDefinitions'
 export { BlockDefinitionVersions } from './collections/BlockDefinitionVersions'
 
-//â"€â"€ Types â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+//── Types ─────────────────────────────────────────────────────────────────────
 export type {
   BlockSchema,
   BlockFieldDefinition,

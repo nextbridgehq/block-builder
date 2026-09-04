@@ -1,4 +1,4 @@
-﻿import type { Tab } from 'payload'
+import type { Tab } from 'payload'
 
 export function dbLayoutField(fieldName: string = 'dbLayout', tabLabel: string = 'DB Layout'): Tab {
   return {

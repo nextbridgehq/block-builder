@@ -1,4 +1,4 @@
-﻿/* â”€â”€ Block Builder â€” Light theme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Block Builder — Light theme ──────────────────────────────────────────── */
 
 *, *::before, *::after { box-sizing: border-box; }
 
@@ -22,13 +22,13 @@
   --bb-text-muted:  #374151;
   --bb-text-subtle: #9ca3af;
 
-  /* Accent â€” Payload light interactive (dark charcoal, mirrors --theme-elevation-1000) */
+  /* Accent — Payload light interactive (dark charcoal, mirrors --theme-elevation-1000) */
   --bb-accent:        #111827;
   --bb-accent-dark:   #000000;
   --bb-accent-subtle: rgba(17, 24, 39, 0.05);
   --bb-accent-border: rgba(17, 24, 39, 0.18);
 
-  /* Publish green â€” kept only for the Publish button */
+  /* Publish green — kept only for the Publish button */
   --bb-publish:       #22c55e;
   --bb-publish-dark:  #16a34a;
 
@@ -41,13 +41,13 @@
   --bb-warning: #f59e0b;
 }
 
-/* â”€â”€ Scrollbars â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Scrollbars ─────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--bb-border-mid); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--bb-border-strong); }
 
-/* â”€â”€ Base â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Base ───────────────────────────────────────────────────────────────── */
 body {
   background: var(--bb-bg);
   color: var(--bb-text);
@@ -55,7 +55,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* â”€â”€ Full-screen state (loading / error) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Full-screen state (loading / error) ────────────────────────────────── */
 .bb-fullscreen {
   height: 100vh;
   display: flex;
@@ -69,7 +69,7 @@ body {
 .bb-fullscreen--error   { color: var(--bb-danger); }
 .bb-fullscreen--loading { color: var(--bb-text-subtle); }
 
-/* â”€â”€ Shell â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Shell ──────────────────────────────────────────────────────────────── */
 .bb-shell {
   display: flex;
   flex-direction: column;
@@ -82,7 +82,7 @@ body {
   line-height: 1.5;
 }
 
-/* â”€â”€ Top Bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Top Bar ────────────────────────────────────────────────────────────── */
 .bb-topbar {
   height: 48px;
   border-bottom: 1px solid var(--bb-border);
@@ -130,7 +130,7 @@ body {
 .bb-topbar__status--ok    { color: var(--bb-publish-dark); }
 .bb-topbar__status--error { color: var(--bb-danger); }
 
-/* â”€â”€ Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Buttons ────────────────────────────────────────────────────────────── */
 .bb-btn {
   display: inline-flex;
   align-items: center;
@@ -168,14 +168,14 @@ body {
   border-color: var(--bb-border-strong);
 }
 
-/* â”€â”€ Main layout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Main layout ────────────────────────────────────────────────────────── */
 .bb-main {
   flex: 1;
   display: flex;
   overflow: hidden;
 }
 
-/* â”€â”€ Sidebar panel (BlockList, FieldPalette) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Sidebar panel (BlockList, FieldPalette) ────────────────────────────── */
 .bb-sidebar {
   border-right: 1px solid var(--bb-border);
   display: flex;
@@ -240,7 +240,7 @@ body {
 }
 .bb-sidebar__add:hover { background: var(--bb-publish-dark); }
 
-/* â”€â”€ Block items â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Block items ────────────────────────────────────────────────────────── */
 .bb-block-item {
   padding: 7px 9px;
   border-radius: 5px;
@@ -304,7 +304,7 @@ body {
   line-height: 1.7;
 }
 
-/* â”€â”€ Field palette â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Field palette ──────────────────────────────────────────────────────── */
 .bb-palette__search-wrap {
   padding: 8px;
   border-bottom: 1px solid var(--bb-border);
@@ -391,7 +391,7 @@ body {
 .bb-palette__item:hover:not(:disabled) .bb-palette__item__label { color: var(--bb-text); }
 .bb-palette__item:hover:not(:disabled) .bb-palette__item__type  { color: var(--bb-text-subtle); }
 
-/* â”€â”€ Canvas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Canvas ─────────────────────────────────────────────────────────────── */
 .bb-canvas {
   flex: 1;
   overflow: auto;
@@ -438,7 +438,7 @@ body {
   gap: 6px;
 }
 
-/* â”€â”€ Field Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Field Card ─────────────────────────────────────────────────────────── */
 .bb-field-card-wrap--dragging { opacity: 0.5; }
 
 .bb-field-card {
@@ -519,7 +519,7 @@ body {
   color: var(--bb-danger);
 }
 
-/* â”€â”€ Config Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Config Panel ───────────────────────────────────────────────────────── */
 .bb-config {
   width: 280px;
   border-left: 1px solid var(--bb-border);
@@ -562,7 +562,7 @@ body {
   overflow-y: auto;
 }
 
-/* â”€â”€ Config forms â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Config forms ───────────────────────────────────────────────────────── */
 .bb-form {
   padding: 14px;
   display: flex;
@@ -717,7 +717,7 @@ body {
 }
 .bb-add-option:hover { border-color: var(--bb-border-strong); color: var(--bb-text-muted); }
 
-/* â”€â”€ Footer / Code Preview â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Footer / Code Preview ──────────────────────────────────────────────── */
 .bb-footer {
   border-top: 1px solid var(--bb-border);
   flex-shrink: 0;
@@ -749,7 +749,7 @@ body {
   overflow: hidden;
 }
 
-/* â”€â”€ Code preview syntax â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Code preview syntax ────────────────────────────────────────────────── */
 .code-preview {
   background: #1e293b;
   font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
@@ -762,14 +762,287 @@ body {
 .token-punct    { color: #89ddff; }
 .token-plain    { color: #f1f5f9; }
 
-/* â”€â”€ Panel animation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Panel animation ────────────────────────────────────────────────────── */
 @keyframes panel-enter {
   from { opacity: 0; transform: translateX(8px); }
   to   { opacity: 1; transform: translateX(0); }
 }
 .panel-enter { animation: panel-enter 0.15s ease-out; }
 
-/* â”€â”€ Notification overlay â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Live Preview ──────────────────────────────────────────────────── */
+.bb-live-preview {
+  flex: 1;
+  border-left: 1px solid var(--bb-border);
+  background: var(--bb-bg);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.bb-live-preview--empty {
+  align-items: center;
+  justify-content: center;
+}
+
+.bb-live-preview__header {
+  height: 40px;
+  border-bottom: 1px solid var(--bb-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  background: var(--bb-surface-0);
+  flex-shrink: 0;
+}
+.bb-live-preview__title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--bb-text-muted);
+}
+.bb-live-preview__meta {
+  font-size: 11.5px;
+  color: var(--bb-text-subtle);
+}
+
+.bb-live-preview__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 24px;
+}
+
+/* Framed "page" surface so the preview reads as a mockup, not a debug list */
+.bb-live-preview__page {
+  max-width: 560px;
+  margin: 0 auto;
+  background: var(--bb-surface-0);
+  border: 1px solid var(--bb-border);
+  border-radius: 10px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(17, 24, 39, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.bb-preview-field { display: flex; flex-direction: column; gap: 6px; }
+
+.bb-preview-field__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.bb-preview-field__icon {
+  display: inline-flex;
+  color: var(--bb-text-subtle);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.bb-preview-field__headtext {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+.bb-preview-field__label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--bb-text-muted);
+  overflow-wrap: anywhere;
+}
+.bb-preview-field__required {
+  color: var(--bb-danger);
+  margin-left: 3px;
+}
+.bb-preview-field__meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.bb-preview-field__slug {
+  font-size: 10.5px;
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  color: var(--bb-text-subtle);
+  background: var(--bb-surface-2);
+  border: 1px solid var(--bb-border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  word-break: break-all;
+}
+.bb-preview-field__badge {
+  font-size: 10px;
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  color: var(--bb-text-subtle);
+  background: var(--bb-surface-3);
+  border: 1px solid var(--bb-border);
+  border-radius: 999px;
+  padding: 1px 8px;
+  flex-shrink: 0;
+}
+
+/* Live Preview mock inputs -- deliberately separate from .bb-input (used by
+   the real FieldConfig edit panel, which is fixed-height and dims heavily
+   when disabled). These need per-type sizing (a textarea must show its rows,
+   a select needs its own arrow) and a legible "empty form field" look rather
+   than a washed-out disabled one. */
+.bb-preview-input {
+  width: 100%;
+  height: 36px;
+  padding: 0 11px;
+  background: var(--bb-surface-2);
+  border: 1px solid var(--bb-border-mid);
+  border-radius: 6px;
+  color: var(--bb-text-subtle);
+  font-size: 13px;
+  font-family: var(--bb-font);
+  box-sizing: border-box;
+}
+.bb-preview-input::placeholder { color: var(--bb-text-subtle); }
+.bb-preview-input:disabled { cursor: default; opacity: 1; }
+/* Native date inputs render their calendar icon dark by default; dim it to
+   match the rest of the muted preview UI. */
+.bb-preview-input[type='date']::-webkit-calendar-picker-indicator { opacity: 0.5; }
+
+.bb-preview-textarea {
+  width: 100%;
+  min-height: 74px;
+  padding: 9px 11px;
+  background: var(--bb-surface-2);
+  border: 1px solid var(--bb-border-mid);
+  border-radius: 6px;
+  color: var(--bb-text-subtle);
+  font-size: 13px;
+  font-family: var(--bb-font);
+  line-height: 1.5;
+  resize: none;
+  box-sizing: border-box;
+}
+.bb-preview-textarea::placeholder { color: var(--bb-text-subtle); }
+.bb-preview-textarea:disabled { cursor: default; opacity: 1; }
+
+.bb-preview-select {
+  width: 100%;
+  height: 36px;
+  padding: 0 34px 0 11px;
+  background-color: var(--bb-surface-2);
+  border: 1px solid var(--bb-border-mid);
+  border-radius: 6px;
+  color: var(--bb-text-subtle);
+  font-size: 13px;
+  font-family: var(--bb-font);
+  box-sizing: border-box;
+  cursor: default;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239ca3af' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+.bb-preview-select:disabled { opacity: 1; }
+.bb-preview-select option { background: var(--bb-surface-0); color: var(--bb-text); }
+
+.bb-preview-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: default;
+}
+.bb-preview-checkbox__input {
+  flex-shrink: 0;
+  margin-top: 3px;
+  width: 15px;
+  height: 15px;
+  accent-color: var(--bb-text-subtle);
+  cursor: default;
+}
+
+.bb-preview-placeholder {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 10px;
+  border: 1px dashed var(--bb-border-mid);
+  border-radius: 6px;
+  color: var(--bb-text-subtle);
+  font-size: 12px;
+  background: var(--bb-surface-2);
+}
+.bb-preview-placeholder--upload { color: var(--bb-text-muted); }
+
+.bb-preview-row {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.bb-preview-row > * { flex: 1; min-width: 0; }
+
+.bb-preview-group {
+  border: 1px solid var(--bb-border-mid);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bb-surface-0);
+}
+.bb-preview-group__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--bb-surface-2);
+  border-bottom: 1px solid var(--bb-border-mid);
+}
+.bb-preview-group__header .bb-preview-field__label { color: var(--bb-text); }
+.bb-preview-group__sublabel {
+  margin-left: 6px;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--bb-text-subtle);
+}
+.bb-preview-group__body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--bb-surface-2);
+}
+
+.bb-preview-tabs__list {
+  display: flex;
+  background: var(--bb-surface-0);
+  border-bottom: 1px solid var(--bb-border-mid);
+  overflow-x: auto;
+  padding: 0 6px;
+}
+.bb-preview-tabs__tab {
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--bb-text-subtle);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.1s;
+}
+.bb-preview-tabs__tab:hover { color: var(--bb-text-muted); }
+.bb-preview-tabs__tab--active {
+  color: var(--bb-text);
+  border-bottom-color: var(--bb-accent);
+  font-weight: 600;
+}
+.bb-preview-tabs__path {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--bb-text-subtle);
+  padding: 8px 10px 0;
+}
+
+/* ── Notification overlay ───────────────────────────────────────────────── */
 @keyframes bb-notify-in {
   from { opacity: 0; transform: translateY(-12px) scale(0.97); }
   to   { opacity: 1; transform: translateY(0)     scale(1);    }
@@ -903,7 +1176,7 @@ body {
   margin-top: 2px;
 }
 
-/* â”€â”€ Warning button (restore as new version) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Warning button (restore as new version) ────────────────────────────── */
 .bb-btn--warning {
   background: #f59e0b;
   color: #fff;
@@ -911,7 +1184,7 @@ body {
 }
 .bb-btn--warning:hover:not(:disabled) { background: #d97706; border-color: #d97706; }
 
-/* â”€â”€ Read-only banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Read-only banner ───────────────────────────────────────────────────── */
 .bb-readonly-banner {
   display: flex;
   align-items: center;
@@ -937,16 +1210,16 @@ body {
 }
 .bb-readonly-banner__btn:hover { color: #92400e; }
 
-/* â”€â”€ Read-only canvas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Read-only canvas ───────────────────────────────────────────────────── */
 .bb-canvas--readonly { pointer-events: none; user-select: none; opacity: 0.7; }
 
-/* â”€â”€ Read-only field palette â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Read-only field palette ────────────────────────────────────────────── */
 .bb-sidebar--readonly {
   opacity: 0.5;
   pointer-events: none;
 }
 
-/* â”€â”€ Read-only config panel overlay â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Read-only config panel overlay ────────────────────────────────────── */
 .bb-config--readonly { position: relative; }
 .bb-config__readonly-overlay {
   position: absolute;
@@ -970,7 +1243,7 @@ body {
   background: var(--bb-surface-0);
 }
 
-/* â”€â”€ Version selector (TopBar dropdown) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Version selector (TopBar dropdown) ─────────────────────────────────── */
 .bb-version-selector {
   position: relative;
   flex-shrink: 0;
@@ -1028,7 +1301,7 @@ body {
   margin-left: 2px;
 }
 
-/* â”€â”€ Version dropdown menu â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Version dropdown menu ──────────────────────────────────────────────── */
 .bb-version-dropdown {
   position: absolute;
   top: calc(100% + 4px);
@@ -1089,7 +1362,7 @@ body {
   flex-shrink: 0;
 }
 
-/* â”€â”€ Block picker (TopBar) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Block picker (TopBar) ──────────────────────────────────────────────── */
 
 .bb-topbar__selectors {
     display: flex;
@@ -1156,7 +1429,7 @@ body {
   white-space: nowrap;
 }
 
-/* â”€â”€ Inline loading / error bars â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Inline loading / error bars ────────────────────────────────────────── */
 .bb-loading-bar {
   padding: 6px 20px;
   font-size: 12px;
@@ -1175,17 +1448,17 @@ body {
   flex-shrink: 0;
 }
 
-/* â”€â”€ Main center column (palette + canvas) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Main center column (palette + canvas) ──────────────────────────────── */
 .bb-main__center {
   flex: 1;
   display: flex;
   overflow: hidden;
 }
 
-/* â”€â”€ Mobile nav (hidden on desktop) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Mobile nav (hidden on desktop) ────────────────────────────────────── */
 .bb-mobile-nav { display: none; }
 
-/* â”€â”€ Responsive â€” Tablet (640â€“1023px) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Responsive — Tablet (640–1023px) ───────────────────────────────────── */
 @media (max-width: 1023px) {
   .bb-topbar__selectors {
     min-width: 0;
@@ -1197,7 +1470,7 @@ body {
   .bb-block-picker__trigger { max-width: 180px; }
 }
 
-/* â”€â”€ Responsive â€” Mobile (<640px) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Responsive — Mobile (<640px) ───────────────────────────────────────── */
 @media (max-width: 639px) {
   /* Topbar: 2-row layout */
   .bb-topbar {
@@ -1264,7 +1537,7 @@ body {
   /* Buttons: proper 44px touch targets */
   .bb-btn { height: 44px; padding: 0 14px; font-size: 13px; }
 
-  /* Main: panel-tab switching â€” each panel fills full width when active */
+  /* Main: panel-tab switching — each panel fills full width when active */
   .bb-main__center { width: 100%; }
 
   /* Hide blocks sidebar and config by default on mobile */
@@ -1280,7 +1553,7 @@ body {
   .bb-main[data-mobile-panel='blocks'] .bb-main__center { display: none; }
   .bb-main[data-mobile-panel='blocks'] .bb-config { display: none; }
 
-  /* Canvas tab â€” palette hidden, canvas visible */
+  /* Canvas tab — palette hidden, canvas visible */
   .bb-sidebar--palette { display: none; }
   .bb-main[data-mobile-panel='canvas'] .bb-sidebar--palette { display: none; }
   .bb-main[data-mobile-panel='canvas'] .bb-canvas { display: flex; flex: 1; }
@@ -1361,3 +1634,85 @@ body {
 }
 
 
+
+/* ── Canvas breadcrumb ─────────────────────────────────────────────────────── */
+.bb-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.bb-breadcrumb__item {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  color: var(--bb-text-subtle);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bb-breadcrumb__item:hover:not([data-current]) {
+  color: var(--bb-text);
+  text-decoration: underline;
+}
+
+.bb-breadcrumb__item[data-current] {
+  color: var(--bb-text);
+  font-weight: 600;
+  cursor: default;
+}
+
+.bb-breadcrumb__sep {
+  color: var(--bb-border-strong);
+  user-select: none;
+}
+
+/* ── Error boundary ────────────────────────────────────────────────────────── */
+.bb-error-boundary {
+  padding: 2rem;
+  margin: 1rem;
+  background: var(--theme-error-50, #fef2f2);
+  border: 1px solid var(--theme-error-200, #fecaca);
+  border-radius: 8px;
+  font-family: var(--bb-font);
+  color: var(--theme-error-900, #7f1d1d);
+}
+
+.bb-error-boundary__title { margin-top: 0; font-size: 16px; }
+
+.bb-error-boundary__details { margin-bottom: 1rem; opacity: 0.85; }
+.bb-error-boundary__details summary { cursor: pointer; font-size: 13px; }
+
+.bb-error-boundary__trace {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 12px;
+  margin: 8px 0 0;
+}
+
+.bb-error-boundary__actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.bb-error-boundary__btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--theme-error-200, #fecaca);
+  background: transparent;
+  color: inherit;
+  border-radius: 4px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+}
+
+.bb-error-boundary__btn--primary {
+  background: var(--theme-error-600, #dc2626);
+  border-color: var(--theme-error-600, #dc2626);
+  color: #fff;
+}
+
+.bb-error-boundary__hint { font-size: 12px; opacity: 0.75; margin: 12px 0 0; }

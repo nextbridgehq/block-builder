@@ -1,0 +1,288 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`codegen golden file > emits a stable Payload Block config for every supported field type 1`] = `
+"import type { Block } from 'payload'
+import { lexicalEditor } from '@payloadcms/richtext-lexical'
+
+export const KitchenSink: Block = {
+  slug: "kitchen-sink",
+  interfaceName: "KitchenSink",
+  labels: {
+    singular: "Kitchen Sink",
+    plural: "Kitchen Sinks",
+  },
+  fields: [
+    {
+      name: "heading",
+      type: 'text',
+      label: "Heading",
+      required: true
+    },
+    {
+      name: "summary",
+      type: 'textarea'
+    },
+    {
+      name: "body",
+      type: 'richText',
+      editor: lexicalEditor({})
+    },
+    {
+      name: "order",
+      type: 'number',
+      defaultValue: 5
+    },
+    {
+      name: "contact",
+      type: 'email'
+    },
+    {
+      name: "publishedAt",
+      type: 'date'
+    },
+    {
+      name: "featured",
+      type: 'checkbox',
+      defaultValue: true
+    },
+    {
+      name: "variant",
+      type: 'select',
+      options: [{ label: "Light", value: "light" }, { label: "Dark", value: "dark" }]
+    },
+    {
+      name: "tags",
+      type: 'select',
+      options: [{ label: "News", value: "news" }],
+      hasMany: true
+    },
+    {
+      name: "hero",
+      type: 'upload',
+      relationTo: "media"
+    },
+    {
+      name: "brochure",
+      type: 'upload',
+      relationTo: "documents"
+    },
+    {
+      name: "author",
+      type: 'relationship',
+      relationTo: "users",
+      hasMany: false
+    },
+    {
+      name: "rawConfig",
+      type: 'json'
+    },
+    {
+      name: "externalLink",
+      type: 'text'
+    },
+    {
+      name: "accent",
+      type: 'text'
+    },
+    {
+      name: "cta",
+      type: 'group',
+      fields: [
+        {
+          name: "label",
+          type: 'text'
+        },
+        {
+          name: "href",
+          type: 'text'
+        }
+      ]
+    },
+    {
+      name: "items",
+      type: 'array',
+      minRows: 1,
+      maxRows: 10,
+      fields: [
+        {
+          name: "title",
+          type: 'text'
+        }
+      ]
+    },
+    {
+      type: 'row',
+      fields: [
+        {
+          name: "left",
+          type: 'text'
+        },
+        {
+          name: "right",
+          type: 'text'
+        }
+      ]
+    },
+    {
+      type: 'collapsible',
+      label: "Advanced",
+      fields: [
+        {
+          name: "debug",
+          type: 'checkbox'
+        }
+      ]
+    },
+    {
+      type: 'tabs',
+      tabs: [
+        {
+          name: "seo",
+          label: "SEO",
+          fields: [
+            {
+              name: "metaTitle",
+              type: 'text'
+            }
+          ]
+        },
+        {
+          label: "Notes",
+          fields: [
+            {
+              name: "internalNote",
+              type: 'textarea'
+            }
+          ]
+        }
+      ]
+    }
+  ],
+}
+"
+`;
+
+exports[`codegen golden file > emits a stable React component stub 1`] = `
+"import React from 'react'
+
+export type KitchenSinkProps = {
+  heading: string
+  summary: string
+  body: any
+  order: number
+  contact: string
+  publishedAt: string
+  featured: boolean
+  variant: string
+  tags: string[]
+  hero: any
+  brochure: any
+  author: any
+  rawConfig: any
+  externalLink: string
+  accent: string
+  cta: { label: string; href: string }
+  items: Array<{ id: string; title: string }>
+  left: string
+  right: string
+  debug: boolean
+  seo: { metaTitle: string }
+  internalNote: string
+}
+
+export function KitchenSink(props: KitchenSinkProps) {
+  return (
+    <div className="kitchen-sink">
+      <div className="field-heading">
+        {/* heading */}
+        {String(props.heading)}
+      </div>
+      <div className="field-summary">
+        {/* summary */}
+        {String(props.summary)}
+      </div>
+      <div className="field-body">
+        {/* body */}
+        {String(props.body)}
+      </div>
+      <div className="field-order">
+        {/* order */}
+        {String(props.order)}
+      </div>
+      <div className="field-contact">
+        {/* contact */}
+        {String(props.contact)}
+      </div>
+      <div className="field-publishedAt">
+        {/* publishedAt */}
+        {String(props.publishedAt)}
+      </div>
+      <div className="field-featured">
+        {/* featured */}
+        {String(props.featured)}
+      </div>
+      <div className="field-variant">
+        {/* variant */}
+        {String(props.variant)}
+      </div>
+      <div className="field-tags">
+        {/* tags */}
+        {String(props.tags)}
+      </div>
+      <div className="field-hero">
+        {/* hero */}
+        {String(props.hero)}
+      </div>
+      <div className="field-brochure">
+        {/* brochure */}
+        {String(props.brochure)}
+      </div>
+      <div className="field-author">
+        {/* author */}
+        {String(props.author)}
+      </div>
+      <div className="field-rawConfig">
+        {/* rawConfig */}
+        {String(props.rawConfig)}
+      </div>
+      <div className="field-externalLink">
+        {/* externalLink */}
+        {String(props.externalLink)}
+      </div>
+      <div className="field-accent">
+        {/* accent */}
+        {String(props.accent)}
+      </div>
+      <div className="field-cta">
+        {/* cta */}
+        {String(props.cta)}
+      </div>
+      <div className="field-items">
+        {/* items */}
+        {String(props.items)}
+      </div>
+      <div className="field-left">
+        {/* left */}
+        {String(props.left)}
+      </div>
+      <div className="field-right">
+        {/* right */}
+        {String(props.right)}
+      </div>
+      <div className="field-debug">
+        {/* debug */}
+        {String(props.debug)}
+      </div>
+      <div className="field-seo">
+        {/* seo */}
+        {String(props.seo)}
+      </div>
+      <div className="field-internalNote">
+        {/* internalNote */}
+        {String(props.internalNote)}
+      </div>
+    </div>
+  )
+}
+"
+`;

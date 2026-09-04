@@ -1,10 +1,10 @@
-﻿'use client'
+'use client'
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useBuilderStore } from '../../store/builder.store'
 import { generateAllBlocks, generateIndexFile } from '../../lib/codegen'
 
-// â"€â"€â"€ Tiny TypeScript syntax tokeniser â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Tiny TypeScript syntax tokeniser ────────────────────────────────────────
 
 type TokenKind = 'keyword' | 'string' | 'comment' | 'type' | 'number' | 'punct' | 'plain'
 
@@ -91,7 +91,7 @@ function HighlightedCode({ code }: { code: string }) {
   )
 }
 
-// â"€â"€â"€ CodePreview component â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── CodePreview component ────────────────────────────────────────────────────
 
 export function CodePreview() {
   const blocks = useBuilderStore((s) => s.blocks)
@@ -107,7 +107,7 @@ export function CodePreview() {
       setActiveFile(null)
       return
     }
-    const blockOutputs = generateAllBlocks(blocks)
+    const blockOutputs = generateAllBlocks(blocks, { react: true })
     const indexOutput = generateIndexFile(blocks)
     const next: Record<string, string> = {}
     for (const out of blockOutputs) next[out.filename] = out.code

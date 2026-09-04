@@ -1,4 +1,4 @@
-﻿export { validateBlockSchema, assertValidBlockSchema } from './schemaValidator'
+export { validateBlockSchema, assertValidBlockSchema } from './schemaValidator'
 export type {
   BlockSchema,
   BlockField,

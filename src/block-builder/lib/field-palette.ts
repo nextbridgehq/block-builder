@@ -1,4 +1,4 @@
-﻿import type { FieldType } from "../types";
+import type { FieldType } from "../types";
 
 export type FieldPaletteItem = {
   type: FieldType;
@@ -19,11 +19,17 @@ export const FIELD_PALETTE: FieldPaletteItem[] = [
   { type: "checkbox",     label: "Checkbox",     description: "Boolean toggle",                icon: "CheckSquare",  category: "basic",      color: "bg-blue-500/20 text-blue-400 border-blue-500/30" },
   // Choice
   { type: "select",       label: "Select",       description: "Dropdown selection",            icon: "ChevronDown",  category: "choice",     color: "bg-purple-500/20 text-purple-400 border-purple-500/30" },
-  { type: "radio",        label: "Radio",        description: "Radio button group",            icon: "Circle",       category: "choice",     color: "bg-purple-500/20 text-purple-400 border-purple-500/30" },
   // Media
-  { type: "upload",       label: "Upload",       description: "File or media upload",          icon: "Upload",       category: "media",      color: "bg-green-500/20 text-green-400 border-green-500/30" },
+  { type: "image",        label: "Image",        description: "Image upload",                  icon: "Image",        category: "media",      color: "bg-green-500/20 text-green-400 border-green-500/30" },
+  { type: "file",         label: "File",         description: "File upload",                   icon: "Upload",       category: "media",      color: "bg-green-500/20 text-green-400 border-green-500/30" },
   // Relational
   { type: "relationship", label: "Relationship", description: "Link to another collection",    icon: "Link",         category: "relational", color: "bg-orange-500/20 text-orange-400 border-orange-500/30" },
+  // Layout
+  { type: "array",        label: "Array",        description: "Repeating list of fields",      icon: "List",         category: "layout",     color: "bg-pink-500/20 text-pink-400 border-pink-500/30" },
+  { type: "group",        label: "Group",        description: "Grouped fields object",         icon: "Box",          category: "layout",     color: "bg-pink-500/20 text-pink-400 border-pink-500/30" },
+  { type: "row",          label: "Row",          description: "Horizontal layout row",         icon: "Columns",      category: "layout",     color: "bg-pink-500/20 text-pink-400 border-pink-500/30" },
+  { type: "tabs",         label: "Tabs",         description: "Tabbed layout container",       icon: "Folder",       category: "layout",     color: "bg-pink-500/20 text-pink-400 border-pink-500/30" },
+  { type: "collapsible",  label: "Collapsible",  description: "Expandable field group",        icon: "ChevronDown",  category: "layout",     color: "bg-pink-500/20 text-pink-400 border-pink-500/30" },
   // Advanced
   { type: "json",         label: "JSON",         description: "Raw JSON data field",           icon: "Braces",       category: "advanced",   color: "bg-red-500/20 text-red-400 border-red-500/30" },
 ];
@@ -33,6 +39,7 @@ export const FIELD_CATEGORIES = [
   { id: "choice", label: "Choice" },
   { id: "media", label: "Media" },
   { id: "relational", label: "Relational" },
+  { id: "layout", label: "Layout" },
   { id: "advanced", label: "Advanced" },
 ] as const;
 

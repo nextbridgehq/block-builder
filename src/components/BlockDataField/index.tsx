@@ -1,10 +1,10 @@
-﻿'use client'
+'use client'
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useField, useFormFields, useListDrawer } from '@payloadcms/ui'
 import type { BlockFieldDefinition } from '../../validation/types'
 
-// â"€â"€â"€ MediaPicker â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── MediaPicker ──────────────────────────────────────────────────────────────
 
 interface MediaValue {
   id: string | number
@@ -165,7 +165,10 @@ function RelationshipPicker({ label, required, collection, hasMany = false, valu
             if (t) setFetchedTitles((prev) => ({ ...prev, [idStr]: String(t) }))
           }
         })
-        .catch(() => { fetchingRef.current.delete(idStr) })
+        .catch((err) => {
+          console.error('[Block Builder] Failed to load relation title:', err)
+          fetchingRef.current.delete(idStr)
+        })
     })
   }, [items, collection])
 
@@ -262,7 +265,7 @@ function RelationshipPicker({ label, required, collection, hasMany = false, valu
   )
 }
 
-// â"€â"€// JsonField
+// ──// JsonField
 
 interface JsonFieldProps {
   label: string
@@ -309,43 +312,151 @@ function JsonField({ label, required, value, onChange }: JsonFieldProps) {
   )
 }
 
-// â"€ SchemaForm â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─ SchemaForm ───────────────────────────────────────────────────────────────
 
 interface SchemaFormProps {
   schema: BlockFieldDefinition[]
   value: Record<string, unknown>
   onChange: (val: Record<string, unknown>) => void
+  depth?: number
 }
 
-function SchemaForm({ schema, value, onChange }: SchemaFormProps) {
+function SchemaForm({ schema, value, onChange, depth = 0 }: SchemaFormProps) {
   const set = useCallback(
     (key: string, val: unknown) => onChange({ ...value, [key]: val }),
     [value, onChange],
   )
 
+  if (depth > 10) {
+    return <div className="bdf-error">Max nesting depth reached (10).</div>
+  }
+
   return (
     <>
-      {schema.map((field) => (
-        <FieldInput
-          key={field.name}
-          field={field}
-          value={value[field.name]}
-          onChange={(v) => set(field.name, v)}
-        />
-      ))}
+      {schema.map((field) => {
+        // Row/Collapsible/Tabs are UI-only containers -- their fields render
+        // against the *same* value/onChange as this SchemaForm, not nested
+        // under `value[field.name]` (only group/array wrap data).
+        if (field.type === 'row') {
+          return (
+            <div key={field.name} className="bdf-row">
+              <SchemaForm schema={field.fields} value={value} onChange={onChange} depth={depth + 1} />
+            </div>
+          )
+        }
+        if (field.type === 'collapsible') {
+          return (
+            <CollapsibleSection key={field.name} field={field} value={value} onChange={onChange} depth={depth + 1} />
+          )
+        }
+        if (field.type === 'tabs') {
+          return (
+            <TabsSection key={field.name} field={field} value={value} onChange={onChange} depth={depth + 1} />
+          )
+        }
+        return (
+          <FieldInput
+            key={field.name}
+            field={field}
+            value={value[field.name]}
+            onChange={(v) => set(field.name, v)}
+            depth={depth}
+          />
+        )
+      })}
     </>
   )
 }
 
-// â"€â"€â"€ FieldInput â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── CollapsibleSection ────────────────────────────────────────────────────────
+
+function CollapsibleSection({
+  field,
+  value,
+  onChange,
+  depth,
+}: {
+  field: Extract<BlockFieldDefinition, { type: 'collapsible' }>
+  value: Record<string, unknown>
+  onChange: (val: Record<string, unknown>) => void
+  depth: number
+}) {
+  const [open, setOpen] = useState(true)
+  return (
+    <div className="bdf-collapsible">
+      <button
+        type="button"
+        className="bdf-collapsible__header"
+        onClick={() => setOpen((o) => !o)}
+      >
+        <span className={`bdf-collapsible__caret${open ? ' bdf-collapsible__caret--open' : ''}`}>▸</span>
+        {field.label}
+      </button>
+      {open && (
+        <div className="bdf-collapsible__body">
+          <SchemaForm schema={field.fields} value={value} onChange={onChange} depth={depth} />
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── TabsSection ────────────────────────────────────────────────────────────────
+
+function TabsSection({
+  field,
+  value,
+  onChange,
+  depth,
+}: {
+  field: Extract<BlockFieldDefinition, { type: 'tabs' }>
+  value: Record<string, unknown>
+  onChange: (val: Record<string, unknown>) => void
+  depth: number
+}) {
+  const [activeTab, setActiveTab] = useState(0)
+  const set = useCallback(
+    (key: string, val: unknown) => onChange({ ...value, [key]: val }),
+    [value, onChange],
+  )
+  const tabs = field.tabs ?? []
+  const tab = tabs[activeTab]
+
+  return (
+    <div className="bdf-tabs">
+      <div className="bdf-tabs__list">
+        {tabs.map((t, i) => (
+          <button
+            key={t.name ?? t.label ?? i}
+            type="button"
+            className={`bdf-tabs__tab${i === activeTab ? ' bdf-tabs__tab--active' : ''}`}
+            onClick={() => setActiveTab(i)}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+      <div className="bdf-tabs__panel">
+        {tab && (
+          tab.name
+            ? <SchemaForm schema={tab.fields} value={(value[tab.name] as Record<string, unknown>) ?? {}} onChange={(v) => set(tab.name!, v)} depth={depth} />
+            : <SchemaForm schema={tab.fields} value={value} onChange={onChange} depth={depth} />
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ─── FieldInput ───────────────────────────────────────────────────────────────
 
 interface FieldInputProps {
   field: BlockFieldDefinition
   value: unknown
   onChange: (val: unknown) => void
+  depth: number
 }
 
-function FieldInput({ field, value, onChange }: FieldInputProps) {
+function FieldInput({ field, value, onChange, depth }: FieldInputProps) {
   const label = field.label ?? field.name
 
   switch (field.type) {
@@ -594,6 +705,7 @@ function FieldInput({ field, value, onChange }: FieldInputProps) {
                       next[i] = updated
                       onChange(next)
                     }}
+                    depth={depth + 1}
                   />
                   <button
                     type="button"
@@ -626,7 +738,7 @@ function FieldInput({ field, value, onChange }: FieldInputProps) {
           <div className="bdf-fieldset">
             <div className="bdf-fieldset__header">{label}</div>
             <div className="bdf-fieldset__body">
-              <SchemaForm schema={subFields} value={groupVal} onChange={onChange} />
+              <SchemaForm schema={subFields} value={groupVal} onChange={onChange} depth={depth + 1} />
             </div>
           </div>
         </div>
@@ -642,7 +754,7 @@ function FieldInput({ field, value, onChange }: FieldInputProps) {
   }
 }
 
-// â"€â"€â"€ BlockDataField â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── BlockDataField ───────────────────────────────────────────────────────────
 
 export function BlockDataField({ path }: { path: string }) {
   const { value, setValue } = useField<Record<string, unknown>>({ path })
@@ -667,6 +779,11 @@ export function BlockDataField({ path }: { path: string }) {
     if (!versionId) {
       setSchema(null)
       setError(null)
+      return
+    }
+
+    if (!/^[a-zA-Z0-9_-]+$/.test(String(versionId))) {
+      setError('Invalid version ID format')
       return
     }
 

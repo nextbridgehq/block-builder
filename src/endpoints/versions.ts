@@ -1,10 +1,8 @@
-﻿import type { PayloadHandler } from 'payload'
+import type { PayloadHandler } from 'payload'
+import { resolveId } from '../utils/resolveId'
+import { withBuilderGuard } from './guard'
 
-export const versionsEndpoint: PayloadHandler = async (req) => {
-  if (!req.user) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
+export const versionsEndpoint: PayloadHandler = withBuilderGuard(async (req) => {
   const slug = req.routeParams?.slug as string | undefined
   if (!slug) {
     return Response.json({ error: 'Slug is required' }, { status: 400 })
@@ -22,12 +20,7 @@ export const versionsEndpoint: PayloadHandler = async (req) => {
     return Response.json({ error: `Block definition "${slug}" not found` }, { status: 404 })
   }
 
-  const currentVersionId =
-    def.currentVersion && typeof def.currentVersion === 'object'
-      ? String((def.currentVersion as { id: unknown }).id)
-      : typeof def.currentVersion === 'string' || typeof def.currentVersion === 'number'
-        ? String(def.currentVersion)
-        : null
+  const currentVersionId = resolveId(def.currentVersion)
 
   const versionsResult = await req.payload.find({
     collection: 'block-definition-versions',
@@ -50,6 +43,4 @@ export const versionsEndpoint: PayloadHandler = async (req) => {
   })
 
   return Response.json({ versions })
-}
-
-
+})
