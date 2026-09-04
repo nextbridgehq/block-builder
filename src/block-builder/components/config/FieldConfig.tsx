@@ -1,20 +1,36 @@
-﻿'use client'
+'use client'
 
 import React from 'react'
-import { useBuilderStore } from '../../store/builder.store'
+import { uuidv4 } from '../../../utils/uuid'
+import { useBuilderStore, getTargetFields, encodeTabPath } from '../../store/builder.store'
 import type { FieldDefinition, FieldType } from '../../types'
 
+// Every type the schema vocabulary defines, not just the ones the palette
+// offers: JSON import can introduce any of them, and a field whose type is
+// missing here renders a blank dropdown that silently rewrites the type on
+// the next change.
 const ALL_TYPES: FieldType[] = [
-  'text', 'textarea', 'number', 'email', 'date', 'checkbox',
-  'select', 'radio', 'upload', 'relationship', 'json',
+  'text', 'textarea', 'richtext', 'number', 'email', 'url', 'color', 'date', 'checkbox',
+  'select', 'multiselect', 'image', 'file', 'relationship', 'json',
+  'array', 'group', 'blocks', 'row', 'tabs', 'collapsible',
 ]
+
+// Payload doesn't support a `defaultValue` on these -- containers/layout
+// types don't hold their own data, and relationship/image/file/json values
+// aren't meaningfully expressible as a single default.
+const NO_DEFAULT_VALUE_TYPES = new Set<FieldType>([
+  'array', 'group', 'blocks', 'row', 'tabs', 'collapsible',
+  'image', 'file', 'relationship', 'json',
+])
 
 export function FieldConfig() {
   const activeBlockId = useBuilderStore((s) => s.activeBlockId)
   const activeFieldId = useBuilderStore((s) => s.activeFieldId)
+  const activeParentPath = useBuilderStore((s) => s.activeParentPath)
   const block = useBuilderStore((s) => s.blocks.find((b) => b.id === activeBlockId))
-  const field = block?.fields.find((f) => f.id === activeFieldId)
+  const field = block ? getTargetFields(block, activeParentPath)?.find((f) => f.id === activeFieldId) : undefined
   const updateField = useBuilderStore((s) => s.updateField)
+  const pushParentPath = useBuilderStore((s) => s.pushParentPath)
 
   if (!activeBlockId || !activeFieldId || !field) {
     return (
@@ -26,7 +42,9 @@ export function FieldConfig() {
     updateField(activeBlockId!, activeFieldId!, updates)
   }
 
-  const needsOptions = field.type === 'select' || field.type === 'radio'
+  // `multiselect` is a `select` with `hasMany`, and the validator rejects
+  // either one without a non-empty `options` array.
+  const needsOptions = field.type === 'select' || field.type === 'multiselect'
 
   return (
     <div className="bb-form">
@@ -93,16 +111,37 @@ export function FieldConfig() {
         </label>
       </div>
 
-      <div className="bb-form__section">
-        <label className="bb-form__label">Default Value</label>
-        <input
-          type="text"
-          value={field.defaultValue !== undefined ? String(field.defaultValue) : ''}
-          onChange={(e) => upd({ defaultValue: e.target.value || undefined })}
-          placeholder="Default value"
-          className="bb-input"
-        />
-      </div>
+      {!NO_DEFAULT_VALUE_TYPES.has(field.type) && (
+        <div className="bb-form__section">
+          <label className="bb-form__label">Default Value</label>
+          {field.type === 'checkbox' ? (
+            <label className="bb-checkbox-row">
+              <input
+                type="checkbox"
+                checked={field.defaultValue === true}
+                onChange={(e) => upd({ defaultValue: e.target.checked })}
+              />
+              Checked by default
+            </label>
+          ) : field.type === 'number' ? (
+            <input
+              type="number"
+              value={typeof field.defaultValue === 'number' ? field.defaultValue : ''}
+              onChange={(e) => upd({ defaultValue: e.target.value === '' ? undefined : e.target.valueAsNumber })}
+              placeholder="0"
+              className="bb-input"
+            />
+          ) : (
+            <input
+              type="text"
+              value={field.defaultValue !== undefined ? String(field.defaultValue) : ''}
+              onChange={(e) => upd({ defaultValue: e.target.value || undefined })}
+              placeholder="Default value"
+              className="bb-input"
+            />
+          )}
+        </div>
+      )}
 
       {field.type === 'relationship' && (
         <>
@@ -110,8 +149,8 @@ export function FieldConfig() {
             <label className="bb-form__label">Relation To (collection slug)</label>
             <input
               type="text"
-              value={field.relationTo ?? ''}
-              onChange={(e) => upd({ relationTo: e.target.value })}
+              value={field.collection ?? ''}
+              onChange={(e) => upd({ collection: e.target.value })}
               placeholder="pages"
               className="bb-input"
             />
@@ -147,6 +186,60 @@ export function FieldConfig() {
               className="bb-input"
             />
           </div>
+        </div>
+      )}
+
+      {field.type === 'tabs' && (
+        <div className="bb-form__section">
+          <div className="bb-options-label">Tabs</div>
+          {(field.tabs ?? []).map((tab, i) => (
+            <div key={tab.id ?? i} className="bb-option-row">
+              <input
+                type="text"
+                value={tab.label}
+                placeholder="Tab label"
+                onChange={(e) => {
+                  const next = [...(field.tabs ?? [])]
+                  next[i] = { ...next[i], label: e.target.value }
+                  upd({ tabs: next })
+                }}
+                className="bb-input"
+              />
+              <button
+                type="button"
+                onClick={() => pushParentPath(encodeTabPath(field.id, i))}
+                className="bb-add-option"
+                title="Edit this tab's fields"
+              >
+                Edit Fields
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const next = (field.tabs ?? []).filter((_, k) => k !== i)
+                  upd({ tabs: next })
+                }}
+                className="bb-option-delete"
+                title="Remove tab"
+              >
+                x
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() =>
+              upd({
+                tabs: [
+                  ...(field.tabs ?? []),
+                  { id: uuidv4(), label: `Tab ${(field.tabs?.length ?? 0) + 1}`, fields: [] },
+                ],
+              })
+            }
+            className="bb-add-option"
+          >
+            + Add Tab
+          </button>
         </div>
       )}
 

@@ -1,4 +1,4 @@
-﻿import type { RawFieldInput, RawSchemaInput } from './types'
+import type { RawFieldInput, RawSchemaInput } from './types'
 import type {
   BlockSchema,
   BlockField,
@@ -28,6 +28,9 @@ const KNOWN_TYPES: Set<FieldType> = new Set([
   'relationship',
   'json',
   'blocks',
+  'row',
+  'tabs',
+  'collapsible',
 ])
 
 function normaliseOption(opt: unknown): SelectOption {
@@ -107,6 +110,12 @@ function normaliseField(raw: RawFieldInput): BlockField {
 
   if (raw.label) base.label = String(raw.label)
   if (raw.required !== undefined) base.required = Boolean(raw.required)
+  // `unique` and `localized` apply to every field type and are settable in the
+  // builder's config panel, so they belong in the shared prefix rather than in
+  // one of the per-type branches below -- omitting them here dropped them
+  // silently on publish, and they were gone after the next reload.
+  if (raw.unique !== undefined) base.unique = Boolean(raw.unique)
+  if (raw.localized !== undefined) base.localized = Boolean(raw.localized)
   if (raw.admin && typeof raw.admin === 'object') base.admin = raw.admin
 
   const conditions = normaliseConditions(raw.conditions)
@@ -133,12 +142,20 @@ function normaliseField(raw: RawFieldInput): BlockField {
     case 'number': {
       if (raw.min !== undefined) base.min = Number(raw.min)
       if (raw.max !== undefined) base.max = Number(raw.max)
-      if (raw.defaultValue !== undefined) base.defaultValue = raw.defaultValue
+      if (raw.defaultValue !== undefined && raw.defaultValue !== '') {
+        const n = Number(raw.defaultValue)
+        if (!Number.isNaN(n)) base.defaultValue = n
+      }
       break
     }
 
     case 'checkbox': {
-      if (raw.defaultValue !== undefined) base.defaultValue = Boolean(raw.defaultValue)
+      if (raw.defaultValue !== undefined) {
+        base.defaultValue =
+          typeof raw.defaultValue === 'string'
+            ? raw.defaultValue.toLowerCase() === 'true'
+            : Boolean(raw.defaultValue)
+      }
       break
     }
 
@@ -152,6 +169,17 @@ function normaliseField(raw: RawFieldInput): BlockField {
 
     case 'date': {
       if (raw.timeFormat !== undefined) base.timeFormat = Boolean(raw.timeFormat)
+      if (raw.defaultValue !== undefined) base.defaultValue = raw.defaultValue
+      break
+    }
+
+    // The config panel offers a Default Value input for all of these, and the
+    // emitter writes one out, so the normaliser has to carry it through.
+    case 'richtext':
+    case 'email':
+    case 'url':
+    case 'color': {
+      if (raw.defaultValue !== undefined) base.defaultValue = raw.defaultValue
       break
     }
 
@@ -175,8 +203,15 @@ function normaliseField(raw: RawFieldInput): BlockField {
       break
     }
 
+    // Both upload types carry the target collection through to `relationTo`.
+    case 'image': {
+      if (raw.collection) base.collection = String(raw.collection)
+      break
+    }
+
     case 'file': {
       if (Array.isArray(raw.allowedMimeTypes)) base.allowedMimeTypes = raw.allowedMimeTypes
+      if (raw.collection) base.collection = String(raw.collection)
       break
     }
 
@@ -186,6 +221,31 @@ function normaliseField(raw: RawFieldInput): BlockField {
       }
       if (raw.minBlocks !== undefined) base.minBlocks = Number(raw.minBlocks)
       if (raw.maxBlocks !== undefined) base.maxBlocks = Number(raw.maxBlocks)
+      break
+    }
+
+    case 'row':
+    case 'collapsible': {
+      const subFields = Array.isArray(raw.fields) ? raw.fields.map(normaliseField) : []
+      base.fields = subFields
+      if (resolvedType === 'collapsible') {
+        base.label = String(raw.label ?? 'Collapsible Section')
+      }
+      break
+    }
+
+    case 'tabs': {
+      const rawTabs = Array.isArray(raw.tabs) ? raw.tabs as unknown[] : []
+      base.tabs = rawTabs.map((t) => {
+        const tab = t as Record<string, unknown>
+        return {
+          id: tab.id ? String(tab.id) : undefined,
+          name: tab.name ? String(tab.name) : undefined,
+          label: String(tab.label ?? 'Tab'),
+          description: tab.description ? String(tab.description) : undefined,
+          fields: Array.isArray(tab.fields) ? (tab.fields as RawFieldInput[]).map(normaliseField) : [],
+        }
+      })
       break
     }
   }

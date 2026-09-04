@@ -30,9 +30,11 @@ Payload Block Builder moves block schema definitions from code into your databas
 
 - **Visual drag-and-drop block designer** — No code required to create new block types
 - **Database-stored schemas** — Block definitions live in your DB, not your codebase
-- **Version snapshots** — Every publish creates an immutable version; existing content never breaks
-- **Collection integration** — Adds a "DB Layout" tab to any collection with one line of config
-- **13 field types** — text, textarea, number, email, date, checkbox, select, radio, upload, relationship, json, and more
+- **Version snapshots with restore** — Every publish creates an immutable, concurrency-safe version; browse history, view any past version read-only, or restore it as a new version — existing content never breaks
+- **Collection integration** — Adds a "DB Layout" tab to any collection with one line of config, plus a nav-sidebar shortcut and an "Edit in Builder" button on each block definition
+- **16 field types**, including layout containers — text, textarea, number, email, date, checkbox, select, image, file, relationship, json, and the Row / Group / Array / Tabs / Collapsible layout fields for structuring and nesting a block's own fields
+- **Live Preview** — A self-contained, zero-config panel that renders a block's schema as a mock form as you build it — labels, field slugs (the exact JSON path a frontend integration should read, including array/group nesting and named-tab keys), and realistic placeholders per field type. No external URL or frontend receiver needed.
+- **JSON Import / Export** — Export any block's schema to a `.json` file, or import a hand-authored or previously-exported one back into the builder
 - **Multi-tenant ready** — Each tenant can have its own block definitions without shared config changes
 - **Framework agnostic frontend** — Fetch structured JSON and render with React, Vue, Svelte, or anything else
 - **Automatic init command** — Get up and running in under 2 minutes
@@ -88,6 +90,41 @@ pnpm dev
 ```
 
 Visit `https://your-domain.com/block-builder` and you're ready to build.
+
+---
+
+## Upgrading from 0.1.x
+
+**0.2.0 changes the database schema.** The `block-definition-versions`
+collection gains a `versionIdString` column with a unique index — this is what
+makes concurrent publishing safe, replacing the previous count-then-insert
+version numbering that could hand out the same number twice.
+
+Run a migration before deploying:
+
+```bash
+pnpm payload migrate:create --name=block_builder_0_2_0
+pnpm payload migrate
+```
+
+In dev mode Payload pushes the column automatically; **production will not start
+correctly without the migration.**
+
+Notes:
+
+- Existing version rows are backfilled with `NULL`, which the unique index
+  permits. Historical versions are readable and restorable as before, but the
+  uniqueness guarantee only applies to versions published from 0.2.0 onward.
+- MongoDB users need no migration.
+
+### Other breaking changes in 0.2.0
+
+| Change | Impact |
+| --- | --- |
+| Internal endpoints require an `X-Block-Builder: 1` header | Only affects code calling `/api/blocks/*` directly. The builder UI and admin components send it already. |
+| `generateAllBlocks()` returns one file per block again | Pass `{ react: true }` to also emit the `.tsx` component stub, which 0.2.0-beta emitted unconditionally. |
+| Field-type vocabulary unified | The builder now uses `richtext`, `image`, `file`, and `collection` internally, matching the stored schema. Generated Payload config is unaffected — it is translated at emit time to `richText`, `upload`, and `relationTo`. |
+| `radio` and `upload` removed from the palette | Use `select` and `image`/`file`. Existing schemas still load. |
 
 > **PostgreSQL users:** Payload will automatically push new schema tables on first startup in dev mode. For production migrations:
 >
@@ -208,21 +245,30 @@ npx payload-block-builder init --collections=pages,posts
 
 ### Creating a Block
 
-1. Open `/block-builder` in your browser.
+1. Open `/block-builder` in your browser (also reachable from the admin sidebar and via the "Edit in Builder" button on any block definition).
 2. Click "Add Block" and give it a name and slug.
-3. Drag fields from the panel on the right onto the canvas.
-4. Configure each field (label, name, required, options, etc.).
-5. Click Publish — the block schema is saved to your database and a version snapshot is created.
+3. Drag fields from the panel on the left onto the canvas — including layout fields (Row, Group, Array, Tabs, Collapsible) to nest and structure fields; use each layout field's "Edit Fields" button to drill into its contents.
+4. Configure each field (label, name, required, options, etc.) in the panel on the right.
+5. Open **Live Preview** at any time to see a mock rendering of the block's current shape, with each field's exact data path.
+6. Click Publish — the block schema is validated and saved to your database, and a new immutable version snapshot is created.
+7. Use **Import JSON** / **Export JSON** in the toolbar to move a block's schema in or out as a file — handy for backups, sharing a schema between projects, or hand-authoring one.
 
 ### Using Blocks in a Collection
 
 Any collection listed in the `collections` option gets a new "DB Layout" tab in the Payload admin. Editors can:
 
 1. Click "Add Row" to add a block instance.
-2. Select a block definition and the version of its schema to use.
+2. Select a block definition — its current version is auto-selected, or pick a specific version manually.
 3. Fill in the fields — they render dynamically based on the selected schema.
 4. Reorder, hide, or add anchor IDs to individual block instances.
 5. Save the document as normal.
+
+### Live Preview
+
+The Live Preview panel (toggled from the builder's toolbar) renders the *shape* of a block being designed — not a real page, since the builder has no way to know what a "Hero" block should look like on your actual frontend. For each field it shows:
+
+- The field's label and, right beside it, its **slug** — the exact key a frontend integration reads. For a top-level field this is just its name (`heading`); for a field nested in a Group it's dot-prefixed (`cta.label`); for one inside an Array it gets a trailing `[]` (`items[].title`); for a field inside a *named* Tab it's prefixed by the tab's name (`seo.metaTitle`). Row, Collapsible, and unnamed Tabs are presentation-only in Payload and flatten their children into the surrounding data — so they never show a slug of their own, and their children inherit whatever prefix they themselves received.
+- A realistic, type-appropriate placeholder (respecting an explicit `admin.placeholder` if one is set).
 
 ### Reading Block Data on the Frontend
 
@@ -234,7 +280,7 @@ for (const block of page.dbLayout) {
   const type = block.blockDefinition.slug   // e.g. "hero"
   const fields = block.data                 // { heading: '...', image: '...', ... }
   const isHidden = block.hidden
-  const anchor = block.anchorId
+  const anchor = block.anchor
 }
 ```
 
@@ -257,9 +303,9 @@ function PageRenderer({ blocks }) {
           const Component = blockComponents[block.blockDefinition.slug]
           if (!Component) return null
           return (
-
-
-
+            <section key={block.instanceId ?? i} id={block.anchor || undefined}>
+              <Component {...block.data} />
+            </section>
           )
         })}
     </>
@@ -267,25 +313,30 @@ function PageRenderer({ blocks }) {
 }
 ```
 
-> **Note:** The inner JSX of the `return (` in the React Component Map example is intentionally left blank in this snippet — fill in with your `<section>` / `<Component>` rendering as appropriate for your app.
-
 ---
 
 ## 🧩 Supported Field Types
 
-| Type | Description | Admin UI |
-|---|---|---|
-| `text` | Single-line text input | Standard text field |
-| `textarea` | Multi-line text input | Expandable textarea |
-| `number` | Numeric input | Number field with validation |
-| `email` | Email address | Email field with validation |
-| `date` | Date picker | Calendar date picker |
-| `checkbox` | Boolean toggle | Checkbox input |
-| `select` | Dropdown with custom options | Select dropdown |
-| `radio` | Radio button group | Radio buttons |
-| `upload` | File/image picker | Media library picker |
-| `relationship` | Document picker from any collection | Relationship field |
-| `json` | Raw JSON data | JSON editor |
+| Category | Types |
+|---|---|
+| Basic | `text`, `textarea`, `number`, `email`, `date`, `checkbox` |
+| Choice | `select` (custom label/value options) |
+| Media | `image`, `file` |
+| Relational | `relationship` (link to any collection, optionally `hasMany`) |
+| Layout | `array`, `group`, `row`, `tabs`, `collapsible` |
+| Advanced | `json` (raw JSON data) |
+
+**Layout fields** structure and nest a block's other fields rather than holding a value themselves:
+
+| Type | Behavior |
+|---|---|
+| `group` | Nests its fields' data under its own name (`group.field`) |
+| `array` | A repeating list of fields; each row's data lives under the array's name (`items[].field`) |
+| `row` | Presentation only — lays its fields out horizontally; their data flattens into the parent, no nesting |
+| `collapsible` | Presentation only — an expandable section; its fields also flatten into the parent |
+| `tabs` | A tab strip; a *named* tab nests its fields under the tab's name, an *unnamed* tab flattens into the parent |
+
+Live Preview shows the exact resolved data path for every field, including through nested layout fields — see the Live Preview section above.
 
 ---
 
@@ -319,10 +370,10 @@ function PageRenderer({ blocks }) {
 Key design decisions:
 
 - Block definitions are stored in a `block-definitions` collection. Each document is a named block type with a slug and a list of field definitions.
-- Versions are stored in a `block-definition-versions` collection. Every publish creates an immutable snapshot.
+- Versions are stored in a `block-definition-versions` collection. Every publish creates an immutable snapshot; version numbers are assigned with a retry loop against a unique constraint, so concurrent publishes from two editors can never collide.
 - Documents in opted-in collections store a reference to the exact block version they were built against — updating a block schema later does not break existing content.
 - The DB Layout tab is injected automatically into each collection you list. It renders a dynamic array field where editors pick a block and version.
-- Four internal API endpoints power the builder UI and admin field components. You do not need to call them directly.
+- Four internal API endpoints power the builder UI and admin field components — each requires an authenticated Payload session and a `X-Block-Builder: 1` header (CSRF protection). You do not need to call them directly.
 
 ---
 
@@ -352,6 +403,17 @@ export const Pages: CollectionConfig = {
 
 ---
 
+## 🧪 Testing
+
+The package ships a Vitest suite covering schema normalization, validation, and code generation:
+
+```bash
+npm test          # run once
+npm run test:watch  # watch mode
+```
+
+---
+
 ## 📦 CSS Imports Reference
 
 | Import path | Purpose |
@@ -371,6 +433,14 @@ export const Pages: CollectionConfig = {
 | Marketing teams | Full control to create, update, and reorder blocks on any page, any time |
 | Evolving content schemas | Roll out new block versions without breaking content built against older ones |
 | Headless frontends | Fetch structured block data from the Payload API and render with any framework |
+
+---
+
+## 📝 Changelog
+
+See [CHANGELOG.md](./CHANGELOG.md) for the full history. Latest release:
+
+**0.2.0** — Live Preview, Layout fields (Row/Group/Array/Tabs/Collapsible), JSON Import/Export, version history & restore, concurrency-safe publishing, CSRF protection, and 8 bug fixes.
 
 ---
 

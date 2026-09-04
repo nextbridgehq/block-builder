@@ -1,4 +1,4 @@
-﻿import type { Config, Plugin, TabsField, Tab } from 'payload'
+import type { Config, Plugin, TabsField, Tab } from 'payload'
 import { randomUUID } from 'crypto'
 import { BlockDefinitions } from './collections/BlockDefinitions'
 import { BlockDefinitionVersions } from './collections/BlockDefinitionVersions'
@@ -40,14 +40,14 @@ export const dynamicBlocksPlugin = (options: DynamicBlocksPluginOptions = {}): P
       },
     }
 
-    // â"€â"€ Register collections â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+    // ── Register collections ──────────────────────────────────────────────────
     config.collections = [
       ...(config.collections ?? []),
       BlockDefinitions,
       BlockDefinitionVersions,
     ]
 
-    // â"€â"€ Register endpoints â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+    // ── Register endpoints ────────────────────────────────────────────────────
     config.endpoints = [
       ...(config.endpoints ?? []),
       {
@@ -72,7 +72,7 @@ export const dynamicBlocksPlugin = (options: DynamicBlocksPluginOptions = {}): P
       },
     ]
 
-    // â"€â"€ Inject dbLayout tab into target collections â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+    // ── Inject dbLayout tab into target collections ───────────────────────────
     if (targetCollections.length > 0) {
       config.collections = config.collections.map((collection) => {
         if (!targetCollections.includes(collection.slug)) return collection
@@ -96,7 +96,7 @@ export const dynamicBlocksPlugin = (options: DynamicBlocksPluginOptions = {}): P
           }
         }
 
-        // No tabs field found â€" append the tab inside a new tabs field
+        // No tabs field found — append the tab inside a new tabs field
         return {
           ...collection,
           fields: [

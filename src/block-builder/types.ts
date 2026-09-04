@@ -1,26 +1,7 @@
-﻿// â"€â"€â"€ Field Types â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Field Types ────────────────────────────────────────────────────────────
 
-export type FieldType =
-  | "text"
-  | "textarea"
-  | "number"
-  | "email"
-  | "checkbox"
-  | "select"
-  | "radio"
-  | "date"
-  | "richText"
-  | "upload"
-  | "relationship"
-  | "array"
-  | "group"
-  | "tabs"
-  | "row"
-  | "collapsible"
-  | "json"
-  | "code"
-  | "point"
-  | "ui";
+import type { FieldType } from '../validation/types';
+export type { FieldType };
 
 export type ValidationRule = {
   required?: boolean;
@@ -43,7 +24,7 @@ export type AdminConfig = {
   condition?: string;
 };
 
-// â"€â"€â"€ Field Definition â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Field Definition ────────────────────────────────────────────────────────
 
 export type FieldDefinition = {
   id: string;
@@ -57,15 +38,30 @@ export type FieldDefinition = {
   validation?: ValidationRule;
   admin?: AdminConfig;
   options?: SelectOption[];
-  relationTo?: string;
+  collection?: string;
   hasMany?: boolean;
   maxDepth?: number;
   minRows?: number;
   maxRows?: number;
   fields?: FieldDefinition[];
+  tabs?: TabDefinition[];
 };
 
-// â"€â"€â"€ Block Definition â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+/** A single tab inside a `tabs` layout field. */
+export type TabDefinition = {
+  id?: string;
+  name?: string;
+  /** Display label shown on the tab itself. */
+  label: string;
+  description?: string;
+  /**
+   * A *named* tab nests its children's data under `name`; an unnamed tab is
+   * presentational and flattens them into the surrounding object.
+   */
+  fields: FieldDefinition[];
+};
+
+// ─── Block Definition ────────────────────────────────────────────────────────
 
 export type BlockDefinition = {
   id: string;
@@ -80,7 +76,7 @@ export type BlockDefinition = {
   fields: FieldDefinition[];
 };
 
-// â"€â"€â"€ Builder State â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Builder State ────────────────────────────────────────────────────────────
 
 export type BuilderState = {
   blocks: BlockDefinition[];
@@ -89,7 +85,7 @@ export type BuilderState = {
   isDirty: boolean;
 };
 
-// â"€â"€â"€ Code Generation â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Code Generation ─────────────────────────────────────────────────────────
 
 export type GeneratedOutput = {
   filename: string;

@@ -1,11 +1,11 @@
-﻿import type {
+import type {
   BlockSchema,
   BlockField,
   ValidationResult,
   FieldType,
 } from './types'
 
-// â"€â"€â"€ Constants â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Constants ────────────────────────────────────────────────────────────────
 
 const VALID_FIELD_TYPES: Set<FieldType> = new Set([
   'text',
@@ -26,9 +26,18 @@ const VALID_FIELD_TYPES: Set<FieldType> = new Set([
   'relationship',
   'json',
   'blocks',
+  'row',
+  'tabs',
+  'collapsible',
 ])
 
-const CONTAINER_TYPES = new Set<FieldType>(['array', 'group'])
+const CONTAINER_TYPES = new Set<FieldType>(['array', 'group', 'row', 'collapsible'])
+
+// Payload's `row`, `tabs`, and `collapsible` configs have no `name` -- the
+// emitter strips ours before writing them out. Their names are a builder-only
+// handle, so they cannot collide with anything and take no part in the
+// duplicate or reserved-name checks below.
+const UNNAMED_TYPES = new Set<FieldType>(['row', 'tabs', 'collapsible'])
 const LEAF_NAME_RE = /^[a-zA-Z][a-zA-Z0-9_]*$/
 
 const VALID_CONDITION_OPERATORS = new Set([
@@ -44,7 +53,7 @@ const VALID_CONDITION_OPERATORS = new Set([
   'empty',
 ])
 
-// â"€â"€â"€ Condition validator â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Condition validator ──────────────────────────────────────────────────────
 
 function validateConditions(
   conditions: unknown,
@@ -76,7 +85,7 @@ function validateConditions(
   })
 }
 
-// â"€â"€â"€ Validation-rules object validator â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Validation-rules object validator ───────────────────────────────────────
 
 function validateValidationRules(
   v: Record<string, unknown>,
@@ -147,9 +156,16 @@ function validateValidationRules(
   }
 }
 
-// â"€â"€â"€ Per-field validator â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Per-field validator ──────────────────────────────────────────────────────
 
-function validateField(field: unknown, path: string, errors: string[], warnings: string[]): void {
+function validateField(
+  field: unknown,
+  path: string,
+  errors: string[],
+  warnings: string[],
+  reserved: string[] = [],
+  names: Set<string> = new Set(),
+): void {
   if (!field || typeof field !== 'object' || Array.isArray(field)) {
     errors.push(`${path}: must be a non-array object.`)
     return
@@ -285,7 +301,16 @@ function validateField(field: unknown, path: string, errors: string[], warnings:
     if (!Array.isArray(f.fields) || f.fields.length === 0) {
       errors.push(`${path}: "${type}" fields must have a non-empty "fields" array.`)
     } else {
-      validateFields(f.fields as unknown[], `${path}.fields`, errors, warnings)
+      validateFields(
+        f.fields as unknown[],
+        `${path}.fields`,
+        errors,
+        warnings,
+        childReservedNames(type, reserved),
+        // A `row` or `collapsible` stores its children in the surrounding
+        // object, so they share its namespace; `array` and `group` open one.
+        FLATTENING_TYPES.has(type) ? names : new Set<string>(),
+      )
     }
 
     if (type === 'array') {
@@ -324,31 +349,121 @@ function validateField(field: unknown, path: string, errors: string[], warnings:
       errors.push(`${path}: "minBlocks" (${f.minBlocks}) must be <= "maxBlocks" (${f.maxBlocks}).`)
     }
   }
+
+  if (type === 'tabs') {
+    if (!Array.isArray(f.tabs) || f.tabs.length === 0) {
+      errors.push(`${path}: "tabs" fields must have a non-empty "tabs" array.`)
+    } else {
+      ;(f.tabs as unknown[]).forEach((tab, i) => {
+        const tabPath = `${path}.tabs[${i}]`
+        if (!tab || typeof tab !== 'object') {
+          errors.push(`${tabPath}: must be an object.`)
+          return
+        }
+        const t = tab as Record<string, unknown>
+        if (typeof t.label !== 'string' || !t.label.trim()) {
+          errors.push(`${tabPath}: "label" is required.`)
+        }
+        if (!Array.isArray(t.fields) || t.fields.length === 0) {
+          errors.push(`${tabPath}: "fields" must be a non-empty array.`)
+        } else {
+          // A *named* tab nests its children in their own object; an unnamed one
+          // flattens them into the surrounding object, reserved names and all.
+          const named = typeof t.name === 'string' && t.name.trim().length > 0
+          // The name a named tab nests under is itself a key in the surrounding
+          // object, so it competes with the sibling fields for that namespace.
+          if (named) claimName(String(t.name).trim(), tabPath, errors, reserved, names)
+          validateFields(
+            t.fields as unknown[],
+            `${tabPath}.fields`,
+            errors,
+            warnings,
+            named ? [] : reserved,
+            named ? new Set<string>() : names,
+          )
+        }
+      })
+    }
+  }
 }
 
+// Payload injects these keys into every block's own data object.
+const BLOCK_RESERVED_NAMES = ['id', 'createdAt', 'updatedAt', 'blockType', 'blockName']
+
+// Payload injects an `id` into every array row, so a user-defined `id` inside an
+// array collides just as surely as one at the top level.
+const ARRAY_ROW_RESERVED_NAMES = ['id']
+
+/**
+ * The set of names Payload owns *inside* a container, given what it owned at
+ * the container's own level.
+ *
+ * `row` and `collapsible` are presentational -- their children are stored
+ * directly in the surrounding object, so an `id` inside a top-level Row
+ * collides with the block's injected `id` exactly as one written at the root
+ * would. They therefore inherit the enclosing level's reserved names.
+ * `array` opens a fresh row object with its own injected `id`, and `group`
+ * (like a named tab) opens a nested object Payload injects nothing into.
+ */
+function childReservedNames(type: FieldType, reserved: string[]): string[] {
+  if (FLATTENING_TYPES.has(type)) return reserved
+  if (type === 'array') return ARRAY_ROW_RESERVED_NAMES
+  return []
+}
+
+// Containers whose children are stored in the *surrounding* object rather than
+// in one of their own. An unnamed tab flattens the same way, but it is a `Tab`
+// rather than a field, so it is handled where tabs are walked.
+const FLATTENING_TYPES = new Set<FieldType>(['row', 'collapsible'])
+
+/**
+ * Records `name` as taken in the object being built at this level, reporting a
+ * collision with an earlier sibling or with a key Payload injects.
+ *
+ * `names` is shared across a flattening boundary, so a field inside a Row is
+ * checked against the Row's siblings -- Payload stores them side by side, and
+ * a validator that checked each `fields` array in isolation let that through.
+ */
+function claimName(
+  name: string,
+  path: string,
+  errors: string[],
+  reserved: string[],
+  names: Set<string>,
+): void {
+  if (names.has(name)) {
+    errors.push(`${path}: duplicate field name "${name}".`)
+  }
+  if (reserved.includes(name)) {
+    errors.push(`${path}: field name "${name}" is a reserved word in Payload CMS.`)
+  }
+  names.add(name)
+}
+
+/**
+ * `reserved` is the set of names Payload itself owns at *this* level -- see
+ * `childReservedNames` for how it is derived when descending into a container.
+ */
 function validateFields(
   fields: unknown[],
   path: string,
   errors: string[],
   warnings: string[],
+  reserved: string[] = [],
+  names: Set<string> = new Set(),
 ): void {
-  const names = new Set<string>()
-
   fields.forEach((field, index) => {
     const fieldPath = `${path}[${index}]`
-    validateField(field, fieldPath, errors, warnings)
+    validateField(field, fieldPath, errors, warnings, reserved, names)
 
     const f = field as Record<string, unknown>
-    if (typeof f.name === 'string' && f.name) {
-      if (names.has(f.name)) {
-        errors.push(`${path}: duplicate field name "${f.name}".`)
-      }
-      names.add(f.name)
+    if (typeof f.name === 'string' && f.name && !UNNAMED_TYPES.has(f.type as FieldType)) {
+      claimName(f.name, path, errors, reserved, names)
     }
   })
 }
 
-// â"€â"€â"€ Public API â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Public API ───────────────────────────────────────────────────────────────
 
 export function validateBlockSchema(schema: unknown): ValidationResult {
   const errors: string[] = []
@@ -369,7 +484,7 @@ export function validateBlockSchema(schema: unknown): ValidationResult {
   } else if (s.fields.length === 0) {
     warnings.push('Schema has no fields defined.')
   } else {
-    validateFields(s.fields, 'schema.fields', errors, warnings)
+    validateFields(s.fields, 'schema.fields', errors, warnings, BLOCK_RESERVED_NAMES)
   }
 
   if (

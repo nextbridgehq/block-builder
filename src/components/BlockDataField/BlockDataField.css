@@ -1,6 +1,6 @@
-﻿/* â”€â”€ Block Data Field â€” Payload-native styles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Block Data Field — Payload-native styles ────────────────────────────── */
 
-/* Container â€” mirrors Payload's group/array field outer wrapper */
+/* Container — mirrors Payload's group/array field outer wrapper */
 .bdf-wrap {
   border: 1px solid var(--theme-elevation-200);
   border-radius: 4px;
@@ -9,7 +9,7 @@
   margin-bottom: calc(var(--base, 16px) * 0.5);
 }
 
-/* Header bar â€” like Payload's array-field header */
+/* Header bar — like Payload's array-field header */
 .bdf-heading {
   display: flex;
   align-items: center;
@@ -40,7 +40,7 @@
   flex-direction: column;
 }
 
-/* Label â€” exact Payload .field-label */
+/* Label — exact Payload .field-label */
 .bdf-label {
   display: flex;
   align-items: center;
@@ -57,7 +57,7 @@
   margin-left: 3px;
 }
 
-/* Input â€” exact .sbf-input mirror */
+/* Input — exact .sbf-input mirror */
 .bdf-input {
   box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
   font-family: var(--font-body);
@@ -164,6 +164,95 @@
   gap: calc(var(--base, 16px) * 0.75);
 }
 
+/* Row layout -- fields side by side, flat into parent data */
+.bdf-row {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--base, 16px) * 0.75);
+}
+.bdf-row > * {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Collapsible section -- flat into parent data */
+.bdf-collapsible {
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.bdf-collapsible__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 12px;
+  background: var(--theme-elevation-50);
+  border: none;
+  border-bottom: 1px solid var(--theme-elevation-100);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--theme-elevation-800);
+  font-family: var(--font-body);
+  line-height: 20px;
+  cursor: pointer;
+  text-align: left;
+}
+.bdf-collapsible__caret {
+  display: inline-block;
+  transition: transform 0.1s;
+  color: var(--theme-elevation-400);
+}
+.bdf-collapsible__caret--open {
+  transform: rotate(90deg);
+}
+.bdf-collapsible__body {
+  padding: 12px;
+  background: var(--theme-elevation-0);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--base, 16px) * 0.75);
+}
+
+/* Tabs -- named tabs nest data, unnamed tabs are flat */
+.bdf-tabs {
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.bdf-tabs__list {
+  display: flex;
+  background: var(--theme-elevation-50);
+  border-bottom: 1px solid var(--theme-elevation-100);
+  overflow-x: auto;
+}
+.bdf-tabs__tab {
+  padding: 8px 14px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 13px;
+  font-family: var(--font-body);
+  color: var(--theme-elevation-500);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.bdf-tabs__tab:hover {
+  color: var(--theme-elevation-800);
+}
+.bdf-tabs__tab--active {
+  color: var(--theme-elevation-1000);
+  border-bottom-color: var(--theme-success-500, #22c55e);
+  font-weight: 500;
+}
+.bdf-tabs__panel {
+  padding: 12px;
+  background: var(--theme-elevation-0);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--base, 16px) * 0.75);
+}
+
 /* Multiselect option */
 .bdf-multiselect-opt {
   display: flex;
@@ -214,7 +303,7 @@
   opacity: 1;
 }
 
-/* Add row / add item button â€” mirrors .sbf-add-btn */
+/* Add row / add item button — mirrors .sbf-add-btn */
 .bdf-add-btn {
   display: inline-flex;
   align-items: center;
@@ -246,7 +335,7 @@
   line-height: 1;
 }
 
-/* â”€â”€ Media / Upload picker â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Media / Upload picker ───────────────────────────────────────────────── */
 
 .bdf-upload-area {
   display: flex;
@@ -360,7 +449,7 @@
   color: var(--theme-error-500, #ef4444);
 }
 
-/* â”€â”€ States â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── States ──────────────────────────────────────────────────────────────── */
 
 /* Relationship Picker */
 

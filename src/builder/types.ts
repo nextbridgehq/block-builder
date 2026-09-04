@@ -1,6 +1,6 @@
-﻿import type { BlockSchema, BlockField } from '../validation/types'
+import type { BlockSchema, BlockField } from '../validation/types'
 
-// â"€â"€â"€ Builder input types â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Builder input types ───────────────────────────────────────────────────────
 
 export interface RawFieldInput {
   name?: string
@@ -36,7 +36,7 @@ export interface RawSchemaInput {
   layout?: string
 }
 
-// â"€â"€â"€ Builder save request â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Builder save request ─────────────────────────────────────────────────────
 
 export interface SaveSchemaRequest {
   blockSlug: string

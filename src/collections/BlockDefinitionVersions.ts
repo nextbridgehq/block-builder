@@ -1,4 +1,4 @@
-﻿import type { CollectionConfig } from 'payload'
+import type { CollectionConfig } from 'payload'
 import { authenticated } from '../access/authenticated'
 
 export const BlockDefinitionVersions: CollectionConfig = {
@@ -14,6 +14,19 @@ export const BlockDefinitionVersions: CollectionConfig = {
     read: authenticated,
     update: () => false,
     delete: authenticated,
+  },
+  hooks: {
+    beforeValidate: [
+      ({ data }) => {
+        if (data?.blockDefinition && data?.versionNumber) {
+          const bd = typeof data.blockDefinition === 'object' && data.blockDefinition !== null
+            ? (data.blockDefinition as Record<string, unknown>).id
+            : data.blockDefinition
+          data.versionIdString = `${bd}_${data.versionNumber}`
+        }
+        return data
+      }
+    ]
   },
   fields: [
     {
@@ -52,6 +65,12 @@ export const BlockDefinitionVersions: CollectionConfig = {
       type: 'textarea',
       required: false,
       admin: { description: 'Notes on what changed in this version.' },
+    },
+    {
+      name: 'versionIdString',
+      type: 'text',
+      unique: true,
+      admin: { hidden: true },
     },
   ],
 }

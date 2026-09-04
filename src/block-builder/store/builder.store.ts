@@ -1,14 +1,89 @@
-﻿import { create } from "zustand";
+import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import type { UseBoundStore, StoreApi } from "zustand";
-import { v4 as uuidv4 } from "uuid";
+import { uuidv4 } from "../../utils/uuid";
 import type {
   BlockDefinition,
   BuilderState,
   FieldDefinition,
   FieldType,
 } from "../types";
+
+const TAB_PATH_SEP = "::";
+
+/**
+ * localStorage key used by the persist middleware. Exported so recovery UI
+ * (e.g. the ErrorBoundary) can clear corrupt persisted state without
+ * duplicating the literal.
+ */
+export const BUILDER_PERSIST_KEY = "@nextbridgehq/payload-block-builder";
+
+export function encodeTabPath(fieldId: string, tabIndex: number): string {
+  return `${fieldId}${TAB_PATH_SEP}${tabIndex}`;
+}
+
+function walkPath(
+  block: BlockDefinition,
+  parentPath: string[],
+  create: boolean,
+): FieldDefinition[] | null {
+  let currentFields = block.fields;
+  for (const segment of parentPath) {
+    const sepIndex = segment.indexOf(TAB_PATH_SEP);
+    if (sepIndex !== -1) {
+      // Compound segment: "<tabsFieldId>::<tabIndex>" -- walk into that tab's own
+      // fields array instead of the Tabs field itself, which has no top-level `.fields`.
+      const fieldId = segment.slice(0, sepIndex);
+      const tabIndex = Number(segment.slice(sepIndex + TAB_PATH_SEP.length));
+      const parentField = currentFields.find((f) => f.id === fieldId);
+      if (!parentField || parentField.type !== "tabs" || !Array.isArray(parentField.tabs)) return null;
+      const tab = parentField.tabs[tabIndex];
+      if (!tab) return null;
+      if (!tab.fields) {
+        if (!create) return null;
+        tab.fields = [];
+      }
+      currentFields = tab.fields;
+      continue;
+    }
+
+    const parentField = currentFields.find((f) => f.id === segment);
+    if (!parentField) return null;
+
+    // Support nested fields for layout types
+    if (!parentField.fields) {
+      if (!create) return null;
+      parentField.fields = [];
+    }
+    currentFields = parentField.fields;
+  }
+  return currentFields;
+}
+
+/**
+ * Read-only resolver for the field list at `parentPath`. Safe to call from a
+ * render body -- it never mutates the block. Returns `null` if any segment of
+ * the path is missing (including a container that has no `fields` array yet).
+ */
+export function getTargetFields(
+  block: BlockDefinition,
+  parentPath: string[],
+): FieldDefinition[] | null {
+  return walkPath(block, parentPath, false);
+}
+
+/**
+ * Same walk, but lazily creates missing `fields` arrays on containers. Only
+ * valid inside an immer `set()` callback, where `block` is a draft -- calling it
+ * on live store state mutates outside a setter and skips subscriber updates.
+ */
+function ensureTargetFields(
+  block: BlockDefinition,
+  parentPath: string[],
+): FieldDefinition[] | null {
+  return walkPath(block, parentPath, true);
+}
 
 export function createDefaultField(type: FieldType): FieldDefinition {
   const base: FieldDefinition = {
@@ -21,7 +96,6 @@ export function createDefaultField(type: FieldType): FieldDefinition {
 
   switch (type) {
     case "select":
-    case "radio":
       return {
         ...base,
         options: [
@@ -30,14 +104,31 @@ export function createDefaultField(type: FieldType): FieldDefinition {
         ],
       };
     case "relationship":
-      return { ...base, relationTo: "", hasMany: false };
+      return { ...base, collection: "", hasMany: false };
     case "array":
       return { ...base, fields: [] };
     case "group":
       return { ...base, fields: [] };
+    case "row":
+      return { ...base, fields: [] };
+    case "collapsible":
+      return { ...base, label: base.label ?? "Collapsible Section", fields: [] };
+    case "tabs":
+      return { ...base, tabs: [{ id: uuidv4(), label: "Tab 1", fields: [] }] };
     default:
       return base;
   }
+}
+
+function regenerateFieldIds(fields: FieldDefinition[]): FieldDefinition[] {
+  return fields.map((f) => {
+    const next: FieldDefinition = { ...f, id: uuidv4() };
+    if (next.fields) next.fields = regenerateFieldIds(next.fields);
+    if (next.tabs) {
+      next.tabs = next.tabs.map((tab) => ({ ...tab, fields: regenerateFieldIds(tab.fields) }));
+    }
+    return next;
+  });
 }
 
 function createDefaultBlock(): BlockDefinition {
@@ -66,12 +157,17 @@ type BuilderActions = {
   loadBlock: (block: BlockDefinition) => void;
   setVersionMeta: (versionId: string | null, isReadOnly: boolean) => void;
   setBlockSlug: (slug: string) => void;
+  pushParentPath: (fieldId: string) => void;
+  popParentPath: () => void;
+  truncateParentPath: (depth: number) => void;
+  resetParentPath: () => void;
 };
 
 type BuilderStore = BuilderState & {
   isReadOnly: boolean;
   loadedVersionId: string | null;
   blockSlug: string | null;
+  activeParentPath: string[];
 } & BuilderActions;
 
 const initialState: BuilderState = {
@@ -89,6 +185,7 @@ export const useBuilderStore = (create<BuilderStore>()(
         isReadOnly: false,
         loadedVersionId: null,
         blockSlug: null,
+        activeParentPath: [],
 
         addBlock: () =>
           set((state) => {
@@ -96,6 +193,7 @@ export const useBuilderStore = (create<BuilderStore>()(
             state.blocks.push(block);
             state.activeBlockId = block.id;
             state.activeFieldId = null;
+            state.activeParentPath = [];
             state.isDirty = true;
           }),
 
@@ -105,6 +203,7 @@ export const useBuilderStore = (create<BuilderStore>()(
             if (state.activeBlockId === blockId) {
               state.activeBlockId = state.blocks[0]?.id ?? null;
               state.activeFieldId = null;
+              state.activeParentPath = [];
             }
             state.isDirty = true;
           }),
@@ -120,6 +219,7 @@ export const useBuilderStore = (create<BuilderStore>()(
           set((state) => {
             state.activeBlockId = blockId;
             state.activeFieldId = null;
+            state.activeParentPath = [];
           }),
 
         duplicateBlock: (blockId) =>
@@ -128,11 +228,13 @@ export const useBuilderStore = (create<BuilderStore>()(
             if (!block) return;
             const clone: BlockDefinition = JSON.parse(JSON.stringify(block));
             clone.id = uuidv4();
-            clone.slug = `${block.slug}Copy`;
+            // `-copy`, not `Copy`: saveSchema validates slugs against ^[a-z0-9-]+$,
+            // so the store must not mint a value its own validator rejects.
+            clone.slug = `${block.slug}-copy`;
             clone.interfaceName = block.interfaceName
               ? `${block.interfaceName}Copy`
               : undefined;
-            clone.fields = clone.fields.map((f) => ({ ...f, id: uuidv4() }));
+            clone.fields = regenerateFieldIds(clone.fields);
             const idx = state.blocks.findIndex((b) => b.id === blockId);
             state.blocks.splice(idx + 1, 0, clone);
             state.activeBlockId = clone.id;
@@ -143,8 +245,10 @@ export const useBuilderStore = (create<BuilderStore>()(
           set((state) => {
             const block = state.blocks.find((b) => b.id === blockId);
             if (!block) return;
+            const targetFields = ensureTargetFields(block, state.activeParentPath);
+            if (!targetFields) return;
             const field = createDefaultField(type);
-            block.fields.push(field);
+            targetFields.push(field);
             state.activeFieldId = field.id;
             state.isDirty = true;
           }),
@@ -153,7 +257,12 @@ export const useBuilderStore = (create<BuilderStore>()(
           set((state) => {
             const block = state.blocks.find((b) => b.id === blockId);
             if (!block) return;
-            block.fields = block.fields.filter((f) => f.id !== fieldId);
+            const targetFields = ensureTargetFields(block, state.activeParentPath);
+            if (!targetFields) return;
+            const index = targetFields.findIndex((f) => f.id === fieldId);
+            if (index !== -1) {
+              targetFields.splice(index, 1);
+            }
             if (state.activeFieldId === fieldId) state.activeFieldId = null;
             state.isDirty = true;
           }),
@@ -162,7 +271,9 @@ export const useBuilderStore = (create<BuilderStore>()(
           set((state) => {
             const block = state.blocks.find((b) => b.id === blockId);
             if (!block) return;
-            const field = block.fields.find((f) => f.id === fieldId);
+            const targetFields = ensureTargetFields(block, state.activeParentPath);
+            if (!targetFields) return;
+            const field = targetFields.find((f) => f.id === fieldId);
             if (field) Object.assign(field, updates);
             state.isDirty = true;
           }),
@@ -171,8 +282,10 @@ export const useBuilderStore = (create<BuilderStore>()(
           set((state) => {
             const block = state.blocks.find((b) => b.id === blockId);
             if (!block) return;
-            const [moved] = block.fields.splice(fromIndex, 1);
-            block.fields.splice(toIndex, 0, moved);
+            const targetFields = ensureTargetFields(block, state.activeParentPath);
+            if (!targetFields) return;
+            const [moved] = targetFields.splice(fromIndex, 1);
+            targetFields.splice(toIndex, 0, moved);
             state.isDirty = true;
           }),
 
@@ -181,7 +294,7 @@ export const useBuilderStore = (create<BuilderStore>()(
             state.activeFieldId = fieldId;
           }),
 
-        reset: () => set(() => ({ ...initialState, isReadOnly: false, loadedVersionId: null, blockSlug: null })),
+        reset: () => set(() => ({ ...initialState, isReadOnly: false, loadedVersionId: null, blockSlug: null, activeParentPath: [] })),
         markClean: () => set((state) => { state.isDirty = false; }),
 
         loadBlock: (block) =>
@@ -189,6 +302,7 @@ export const useBuilderStore = (create<BuilderStore>()(
             state.blocks = [block];
             state.activeBlockId = block.id;
             state.activeFieldId = null;
+            state.activeParentPath = [];
             state.isDirty = false;
           }),
 
@@ -202,9 +316,45 @@ export const useBuilderStore = (create<BuilderStore>()(
           set((state) => {
             state.blockSlug = slug;
           }),
+
+        pushParentPath: (fieldId) =>
+          set((state) => {
+            state.activeParentPath.push(fieldId);
+            state.activeFieldId = null;
+          }),
+
+        popParentPath: () =>
+          set((state) => {
+            state.activeParentPath.pop();
+            state.activeFieldId = null;
+          }),
+
+        // Jump directly to an ancestor level -- `depth` is the number of
+        // segments to keep, so breadcrumb index `i` maps to `i + 1`.
+        truncateParentPath: (depth) =>
+          set((state) => {
+            if (depth < 0 || depth >= state.activeParentPath.length) return;
+            state.activeParentPath = state.activeParentPath.slice(0, depth);
+            state.activeFieldId = null;
+          }),
+
+        resetParentPath: () =>
+          set((state) => {
+            state.activeParentPath = [];
+            state.activeFieldId = null;
+          }),
       })),
       {
-        name: "@nextbridgehq/payload-block-builder",
+        name: BUILDER_PERSIST_KEY,
+        version: 1,
+        migrate: (persistedState: unknown, version: number) => {
+          if (version === 0) {
+            // Version 0 predates the unified field-type system (Feature 3) and the
+            // Row/Tabs/Collapsible shapes -- discard old state rather than crash on load.
+            return { blocks: [], activeBlockId: null } as unknown as BuilderStore
+          }
+          return persistedState as BuilderStore
+        },
         partialize: (state) => ({
           blocks: state.blocks,
           activeBlockId: state.activeBlockId,
@@ -212,6 +362,4 @@ export const useBuilderStore = (create<BuilderStore>()(
       }
     )
   )
-)) as unknown as UseBoundStore<StoreApi<BuilderStore>>
-
-
+)) as UseBoundStore<StoreApi<BuilderStore>>

@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # Order matters: typecheck is the cheapest gate and catches the class of
+      # bug (a silently overwritten JSX prop) that reached a release before.
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      # Guards the two things that have regressed more than once: CRLF creeping
+      # back in, and UTF-8 comments being re-encoded through cp1252.
+      - name: Check encoding and line endings
+        run: npm run check:encoding

@@ -8,6 +8,8 @@ import { BuilderCanvas } from './BuilderCanvas'
 import { ConfigPanel } from './ConfigPanel'
 import { FieldPalette } from '../sidebar/FieldPalette'
 import { CodePreview } from './CodePreview'
+import { LivePreview } from './LivePreview'
+import { ErrorBoundary } from '../ErrorBoundary'
 import type { BlockDefinition } from '../../types'
 
 export type VersionInfo = {
@@ -49,25 +51,40 @@ export function BuilderShell({ loadSlug }: Props) {
   const [selectedVersionId, setSelectedVersionId] = useState<string | null>(null)
   const [blockDefs, setBlockDefs] = useState<BlockDefInfo[]>([])
   const [mobilePanelTab, setMobilePanelTab] = useState<'blocks' | 'canvas' | 'palette' | 'config'>('blocks')
+  const [isMounted, setIsMounted] = useState(false)
+  const [previewOpen, setPreviewOpen] = useState(false)
 
-  // Fetch all block definitions for the picker
   useEffect(() => {
-    fetch('/api/block-definitions?limit=200&depth=0')
-      .then((r) => r.json())
-      .then((json: { docs?: Array<{ id: string; slug: string; name: string }> }) => {
-        setBlockDefs(
-          (json.docs ?? []).map((d) => ({ id: String(d.id), slug: d.slug, name: d.name })),
-        )
-      })
-      .catch((err: unknown) => {
-        console.error('[block-builder] Failed to load block definitions:', err)
-        setNotification({ status: 'error', title: 'Failed to load block definitions', errors: ['Could not load block definitions. Please refresh the page.'] })
-      })
+    setIsMounted(true)
   }, [])
+
+  // Fetch all block definitions for the picker. `reportErrors` is off when this
+  // runs as a refresh after a publish -- a failed refresh must not replace the
+  // success notification the publish just set.
+  const refreshBlockDefs = useCallback(async (reportErrors = false) => {
+    try {
+      const res = await fetch('/api/block-definitions?limit=200&depth=0')
+      const json = (await res.json()) as { docs?: Array<{ id: string; slug: string; name: string }> }
+      setBlockDefs(
+        (json.docs ?? []).map((d) => ({ id: String(d.id), slug: d.slug, name: d.name })),
+      )
+    } catch (err: unknown) {
+      console.error('[block-builder] Failed to load block definitions:', err)
+      if (reportErrors) {
+        setNotification({ status: 'error', title: 'Failed to load block definitions', errors: ['Could not load block definitions. Please refresh the page.'] })
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    refreshBlockDefs(true)
+  }, [refreshBlockDefs])
 
   const loadVersionsForSlug = useCallback(async (slug: string): Promise<VersionInfo[]> => {
     try {
-      const res = await fetch(`/api/block-builder/versions/${encodeURIComponent(slug)}`)
+      const res = await fetch(`/api/block-builder/versions/${encodeURIComponent(slug)}`, {
+        headers: { 'X-Block-Builder': '1' }
+      })
       const json = await res.json() as { versions?: VersionInfo[] }
       return json.versions ?? []
     } catch {
@@ -83,7 +100,9 @@ export function BuilderShell({ loadSlug }: Props) {
       : `/api/block-builder/load/${encodeURIComponent(slug)}`
 
     try {
-      const res = await fetch(url)
+      const res = await fetch(url, {
+        headers: { 'X-Block-Builder': '1' }
+      })
       const json = await res.json() as {
         block?: BlockDefinition
         versionId?: string | null
@@ -142,15 +161,36 @@ export function BuilderShell({ loadSlug }: Props) {
     if (current) setSelectedVersionId(current.id)
   }
 
-  async function handleAfterPublish() {
-    if (!activeSlug) return
-    const list = await loadVersionsForSlug(activeSlug)
+  // A block added in the builder has no `activeSlug` until it is published, and
+  // a block whose slug was edited publishes under a *different* one. Either way
+  // the version list has to be refreshed for the slug the server just wrote,
+  // not for whatever was last loaded -- otherwise the dropdown shows the
+  // previous block's versions and selecting one silently replaces the new
+  // block's contents.
+  async function handleAfterPublish(publishedSlug: string) {
+    setActiveSlug(publishedSlug)
+    setBlockSlug(publishedSlug)
+
+    const [list] = await Promise.all([
+      loadVersionsForSlug(publishedSlug),
+      // A first publish creates a definition the picker has never seen.
+      refreshBlockDefs(),
+    ])
     setVersions(list)
     const current = list.find((v) => v.isCurrent) ?? list[0]
-    if (current) setSelectedVersionId(current.id)
+    setSelectedVersionId(current ? current.id : null)
+  }
+
+  if (!isMounted) {
+    return (
+      <div className="bb-shell">
+        <div className="bb-loading-bar">Initializing Builder...</div>
+      </div>
+    )
   }
 
   return (
+    <ErrorBoundary>
     <div className="bb-shell">
       <TopBar
         blockDefs={blockDefs}
@@ -163,6 +203,8 @@ export function BuilderShell({ loadSlug }: Props) {
         onAfterPublish={handleAfterPublish}
         notification={notification}
         onSetNotification={setNotification}
+        previewOpen={previewOpen}
+        onTogglePreview={() => setPreviewOpen((p) => !p)}
       />
 
       {loading && (
@@ -187,9 +229,10 @@ export function BuilderShell({ loadSlug }: Props) {
 
       <div className="bb-main" data-mobile-panel={mobilePanelTab}>
         <BlockList blockDefs={blockDefs} activeSlug={activeSlug} onBlockSelect={loadBlockBySlug} />
-        <div className="bb-main__center">
+        <div className="bb-main__center" style={{ display: 'flex', flex: 1 }}>
           <FieldPalette />
           <BuilderCanvas />
+          {previewOpen && <LivePreview />}
         </div>
         <ConfigPanel />
       </div>
@@ -231,5 +274,6 @@ export function BuilderShell({ loadSlug }: Props) {
         ))}
       </nav>
     </div>
+    </ErrorBoundary>
   )
 }

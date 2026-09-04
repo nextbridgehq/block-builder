@@ -1,4 +1,4 @@
-﻿// Client-only entry point â€" imported by Next.js webpack, never by tsx/Node.
+// Client-only entry point — imported by Next.js webpack, never by tsx/Node.
 // Component path strings use '@nextbridgehq/payload-block-builder/client#Name'.
 
 export { BlockDataField } from './components/BlockDataField/index'

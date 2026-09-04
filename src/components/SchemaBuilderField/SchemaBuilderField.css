@@ -1,6 +1,6 @@
-﻿/* â”€â”€ Schema Builder Field â€” Payload light theme tokens â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Schema Builder Field — Payload light theme tokens ───────────────────── */
 
-/* â”€â”€ Input â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Input ──────────────────────────────────────────────────────────────── */
 .sbf-input {
   box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
   font-family: var(--font-body);
@@ -45,7 +45,7 @@
   font-size: 1rem;
 }
 
-/* â”€â”€ Select â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Select ─────────────────────────────────────────────────────────────── */
 .sbf-select {
   cursor: pointer;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
@@ -54,7 +54,7 @@
   padding-right: 32px;
 }
 
-/* â”€â”€ Field label â€” mirrors Payload .field-label â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Field label — mirrors Payload .field-label ─────────────────────────── */
 .sbf-label {
   display: flex;
   align-items: center;
@@ -71,7 +71,7 @@
   margin-left: 5px;
 }
 
-/* â”€â”€ Field description â€” mirrors .field-description â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Field description — mirrors .field-description ─────────────────────── */
 .sbf-description {
   display: flex;
   color: var(--theme-elevation-400);
@@ -81,7 +81,7 @@
   font-family: var(--font-body);
 }
 
-/* â”€â”€ Collapsible row â€” mirrors .collapsible--style-default â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Collapsible row — mirrors .collapsible--style-default ──────────────── */
 .sbf-row {
   border: 1px solid var(--theme-elevation-200);
   border-radius: var(--style-radius-s, 4px);
@@ -90,7 +90,7 @@
 }
 .sbf-row:hover { border-color: var(--theme-elevation-300); }
 
-/* Row header â€” mirrors .collapsible__toggle-wrap */
+/* Row header — mirrors .collapsible__toggle-wrap */
 .sbf-row__header {
   position: relative;
   padding: 8px 8px 8px 16px;
@@ -116,7 +116,7 @@
   border-bottom-left-radius: var(--style-radius-s, 4px);
 }
 
-/* Row content â€” mirrors .collapsible__content */
+/* Row content — mirrors .collapsible__content */
 .sbf-row__content {
   background: var(--theme-elevation-0);
   border-bottom-left-radius: var(--style-radius-s, 4px);
@@ -128,7 +128,7 @@
   border-top: 1px solid var(--theme-elevation-150);
 }
 
-/* â”€â”€ Row label & badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Row label & badge ──────────────────────────────────────────────────── */
 .sbf-row__label {
   flex: 1;
   font-size: 13px;
@@ -160,7 +160,7 @@
   flex-shrink: 0;
 }
 
-/* â”€â”€ Icon action button â€” mirrors .collapsible__actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Icon action button — mirrors .collapsible__actions ─────────────────── */
 .sbf-icon-btn {
   display: flex;
   align-items: center;
@@ -188,14 +188,14 @@
   color: var(--theme-error-500, #ef4444);
 }
 
-/* â”€â”€ 2-column grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── 2-column grid ──────────────────────────────────────────────────────── */
 .sbf-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: calc(var(--base, 16px) * 0.75);
 }
 
-/* â”€â”€ Checkbox row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Checkbox row ───────────────────────────────────────────────────────── */
 .sbf-checkbox-wrap {
   display: flex;
   align-items: center;
@@ -219,14 +219,14 @@
   cursor: pointer;
 }
 
-/* â”€â”€ Flags row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Flags row ──────────────────────────────────────────────────────────── */
 .sbf-flags-row {
   display: flex;
   gap: calc(var(--base, 16px) * 1.5);
   flex-wrap: wrap;
 }
 
-/* â”€â”€ Section accordion (Admin settings / Conditions) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Section accordion (Admin settings / Conditions) ────────────────────── */
 .sbf-section {
   border: 1px solid var(--theme-elevation-100);
   border-radius: var(--style-radius-s, 4px);
@@ -267,7 +267,7 @@
   border-top: 1px solid var(--theme-elevation-100);
 }
 
-/* â”€â”€ Nested fields â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Nested fields ──────────────────────────────────────────────────────── */
 .sbf-nested {
   border-left: 2px solid var(--theme-elevation-200);
   padding-left: 12px;
@@ -277,7 +277,7 @@
   gap: calc(var(--base, 16px) / 2);
 }
 
-/* â”€â”€ Options row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Options row ────────────────────────────────────────────────────────── */
 .sbf-options-row {
   display: grid;
   grid-template-columns: 1fr 1fr auto;
@@ -285,7 +285,7 @@
   align-items: center;
 }
 
-/* â”€â”€ Conditions grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Conditions grid ────────────────────────────────────────────────────── */
 .sbf-conditions-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr auto;
@@ -293,7 +293,7 @@
   align-items: end;
 }
 
-/* â”€â”€ Add Field button â€” mirrors Payload array add-row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Add Field button — mirrors Payload array add-row ───────────────────── */
 .sbf-add-btn {
   display: inline-flex;
   align-items: center;
@@ -329,7 +329,7 @@
 .sbf-add-btn--small { font-size: 12px; gap: 5px; }
 .sbf-add-btn--small .sbf-add-btn__icon { width: 18px; height: 18px; font-size: 12px; }
 
-/* â”€â”€ Section heading â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Section heading ────────────────────────────────────────────────────── */
 .sbf-section-heading {
   display: flex;
   align-items: center;
@@ -346,7 +346,7 @@
   font-weight: 400;
 }
 
-/* â”€â”€ Empty state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Empty state ────────────────────────────────────────────────────────── */
 .sbf-empty {
   padding: calc(var(--base, 16px) * 1.5) var(--base, 16px);
   border: 1px dashed var(--theme-elevation-200);

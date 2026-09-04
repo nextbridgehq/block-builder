@@ -1,4 +1,4 @@
-﻿// â"€â"€â"€ Field Types â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Field Types ───────────────────────────────────────────────────────────────
 
 export type FieldType =
   | 'text'
@@ -19,8 +19,11 @@ export type FieldType =
   | 'relationship'
   | 'json'
   | 'blocks'
+  | 'row'
+  | 'tabs'
+  | 'collapsible'
 
-// â"€â"€â"€ Feature 1: Conditional Logic â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Feature 1: Conditional Logic ────────────────────────────────────────────
 
 export type ConditionOperator =
   | 'equals'
@@ -40,7 +43,7 @@ export interface ConditionRule {
   value?: unknown
 }
 
-// â"€â"€â"€ Feature 2: Advanced Validation Rules â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Feature 2: Advanced Validation Rules ────────────────────────────────────
 
 export interface ValidationRules {
   required?: boolean
@@ -59,7 +62,7 @@ export interface ValidationRules {
   maxSelections?: number
 }
 
-// â"€â"€â"€ Feature 3: Visual UI Metadata â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Feature 3: Visual UI Metadata ───────────────────────────────────────────
 
 export type UIWidth = 'full' | 'half' | 'third' | 'quarter'
 
@@ -71,7 +74,7 @@ export interface UIMetadata {
   order?: number
 }
 
-// â"€â"€â"€ Feature 5: Responsive Values â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Feature 5: Responsive Values ────────────────────────────────────────────
 
 export type Breakpoint = 'desktop' | 'tablet' | 'mobile'
 
@@ -81,13 +84,17 @@ export interface ResponsiveValue<T = unknown> {
   mobile?: T
 }
 
-// â"€â"€â"€ Base Field â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Base Field ───────────────────────────────────────────────────────────────
 
 export interface BaseField {
   name: string
   type: FieldType
   label?: string
   required?: boolean
+  /** Payload's `unique` index flag. Settable on every field in the builder. */
+  unique?: boolean
+  /** Payload's `localized` flag. Settable on every field in the builder. */
+  localized?: boolean
   admin?: {
     description?: string
     readOnly?: boolean
@@ -102,7 +109,7 @@ export interface BaseField {
   responsive?: boolean
 }
 
-// â"€â"€â"€ Leaf Field Types â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Leaf Field Types ─────────────────────────────────────────────────────────
 
 export interface TextField extends BaseField {
   type: 'text'
@@ -120,6 +127,7 @@ export interface TextareaField extends BaseField {
 
 export interface RichTextField extends BaseField {
   type: 'richtext'
+  defaultValue?: string
 }
 
 export interface NumberField extends BaseField {
@@ -159,23 +167,30 @@ export interface DateField extends BaseField {
 
 export interface ImageField extends BaseField {
   type: 'image'
+  /** Upload-enabled collection this field points at. Defaults to `media`. */
+  collection?: string
 }
 
 export interface FileField extends BaseField {
   type: 'file'
   allowedMimeTypes?: string[]
+  /** Upload-enabled collection this field points at. Defaults to `media`. */
+  collection?: string
 }
 
 export interface UrlField extends BaseField {
   type: 'url'
+  defaultValue?: string
 }
 
 export interface EmailField extends BaseField {
   type: 'email'
+  defaultValue?: string
 }
 
 export interface ColorField extends BaseField {
   type: 'color'
+  defaultValue?: string
 }
 
 export interface ArrayField extends BaseField {
@@ -200,7 +215,7 @@ export interface JsonField extends BaseField {
   type: 'json'
 }
 
-// â"€â"€â"€ Feature 4: Nested / Composable Blocks â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Feature 4: Nested / Composable Blocks ────────────────────────────────────
 
 export interface BlocksField extends BaseField {
   type: 'blocks'
@@ -215,7 +230,32 @@ export interface NestedBlockValue {
   data: BlockData
 }
 
-// â"€â"€â"€ Block Field Union â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Layout Fields ────────────────────────────────────────────────────────
+
+export interface RowField extends BaseField {
+  type: 'row'
+  fields: BlockField[]
+}
+
+export interface Tab {
+  name?: string
+  label: string
+  description?: string
+  fields: BlockField[]
+}
+
+export interface TabsField extends BaseField {
+  type: 'tabs'
+  tabs: Tab[]
+}
+
+export interface CollapsibleField extends BaseField {
+  type: 'collapsible'
+  label: string
+  fields: BlockField[]
+}
+
+// ─── Block Field Union ────────────────────────────────────────────────────────
 
 export type BlockField =
   | TextField
@@ -236,15 +276,18 @@ export type BlockField =
   | RelationshipField
   | JsonField
   | BlocksField
+  | RowField
+  | TabsField
+  | CollapsibleField
 
-// â"€â"€â"€ Block Schema â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Block Schema ─────────────────────────────────────────────────────────────
 
 export interface BlockSchema {
   fields: BlockField[]
   layout?: 'default' | 'sidebar' | 'tabs'
 }
 
-// â"€â"€â"€ Validation Results â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Validation Results ───────────────────────────────────────────────────────
 
 export interface ValidationResult {
   valid: boolean
@@ -252,7 +295,7 @@ export interface ValidationResult {
   warnings: string[]
 }
 
-// â"€â"€â"€ Block Instance Data â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Block Instance Data ──────────────────────────────────────────────────────
 
 export type BlockData = Record<string, unknown>
 
@@ -261,7 +304,7 @@ export interface DataValidationResult {
   errors: Array<{ path: string; message: string }>
 }
 
-// â"€â"€â"€ Backward-compatible aliases â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Backward-compatible aliases ─────────────────────────────────────────────
 
 export type BlockFieldType = FieldType
 export type BlockSelectOption = SelectOption
