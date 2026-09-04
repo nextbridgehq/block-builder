@@ -8,6 +8,8 @@
 
 Developed and open-sourced by [Nextbridge](https://nextbridge.com).
 
+[GitHub](https://github.com/nextbridgehq/block-builder) · [Releases](https://github.com/nextbridgehq/block-builder/releases) · [Issues](https://github.com/nextbridgehq/block-builder/issues) · [Changelog](./CHANGELOG.md) · [Payload CMS](https://payloadcms.com)
+
 ## Screenshots
 
 ![Block Builder canvas](https://raw.githubusercontent.com/nextbridgehq/block-builder/main/docs/screenshots/canvas.png)
@@ -42,24 +44,6 @@ Payload Block Builder moves block schema definitions from code into your databas
 
 ---
 
-## 📋 Compatibility
-
-| Requirement | Version |
-|---|---|
-| Payload CMS | v3.x |
-| Node.js | ≥ 18 |
-| Next.js | ≥ 14 |
-
-### Database Support
-
-| Database | Adapter |
-|---|---|
-| PostgreSQL / Supabase / Neon | `@payloadcms/db-postgres` |
-| SQLite / Turso / LibSQL | `@payloadcms/db-sqlite` |
-| MongoDB | `@payloadcms/db-mongodb` |
-
----
-
 ## 🚀 Quick Start
 
 ### Option A — Automatic Setup (Recommended)
@@ -90,50 +74,6 @@ pnpm dev
 ```
 
 Visit `https://your-domain.com/block-builder` and you're ready to build.
-
----
-
-## Upgrading from 0.1.x
-
-**0.2.0 changes the database schema.** The `block-definition-versions`
-collection gains a `versionIdString` column with a unique index — this is what
-makes concurrent publishing safe, replacing the previous count-then-insert
-version numbering that could hand out the same number twice.
-
-Run a migration before deploying:
-
-```bash
-pnpm payload migrate:create --name=block_builder_0_2_0
-pnpm payload migrate
-```
-
-In dev mode Payload pushes the column automatically; **production will not start
-correctly without the migration.**
-
-Notes:
-
-- Existing version rows are backfilled with `NULL`, which the unique index
-  permits. Historical versions are readable and restorable as before, but the
-  uniqueness guarantee only applies to versions published from 0.2.0 onward.
-- MongoDB users need no migration.
-
-### Other breaking changes in 0.2.0
-
-| Change | Impact |
-| --- | --- |
-| Internal endpoints require an `X-Block-Builder: 1` header | Only affects code calling `/api/blocks/*` directly. The builder UI and admin components send it already. |
-| `generateAllBlocks()` returns one file per block again | Pass `{ react: true }` to also emit the `.tsx` component stub, which 0.2.0-beta emitted unconditionally. |
-| Field-type vocabulary unified | The builder now uses `richtext`, `image`, `file`, and `collection` internally, matching the stored schema. Generated Payload config is unaffected — it is translated at emit time to `richText`, `upload`, and `relationTo`. |
-| `radio` and `upload` removed from the palette | Use `select` and `image`/`file`. Existing schemas still load. |
-
-> **PostgreSQL users:** Payload will automatically push new schema tables on first startup in dev mode. For production migrations:
->
-> ```bash
-> pnpm payload migrate:create --name=add_block_builder
-> pnpm payload migrate
-> ```
-
----
 
 <details>
 <summary><strong>Option B — Manual Setup</strong></summary>
@@ -212,6 +152,48 @@ pnpm dev
 ```
 
 </details>
+
+---
+
+## Upgrading from 0.1.x
+
+**0.2.0 changes the database schema.** The `block-definition-versions`
+collection gains a `versionIdString` column with a unique index — this is what
+makes concurrent publishing safe, replacing the previous count-then-insert
+version numbering that could hand out the same number twice.
+
+Run a migration before deploying:
+
+```bash
+pnpm payload migrate:create --name=block_builder_0_2_0
+pnpm payload migrate
+```
+
+In dev mode Payload pushes the column automatically; **production will not start
+correctly without the migration.**
+
+Notes:
+
+- Existing version rows are backfilled with `NULL`, which the unique index
+  permits. Historical versions are readable and restorable as before, but the
+  uniqueness guarantee only applies to versions published from 0.2.0 onward.
+- MongoDB users need no migration.
+
+### Other breaking changes in 0.2.0
+
+| Change | Impact |
+| --- | --- |
+| Internal endpoints require an `X-Block-Builder: 1` header | Only affects code calling `/api/blocks/*` directly. The builder UI and admin components send it already. |
+| `generateAllBlocks()` returns one file per block again | Pass `{ react: true }` to also emit the `.tsx` component stub, which 0.2.0-beta emitted unconditionally. |
+| Field-type vocabulary unified | The builder now uses `richtext`, `image`, `file`, and `collection` internally, matching the stored schema. Generated Payload config is unaffected — it is translated at emit time to `richText`, `upload`, and `relationTo`. |
+| `radio` and `upload` removed from the palette | Use `select` and `image`/`file`. Existing schemas still load. |
+
+> **PostgreSQL users:** Payload will automatically push new schema tables on first startup in dev mode. For production migrations:
+>
+> ```bash
+> pnpm payload migrate:create --name=add_block_builder
+> pnpm payload migrate
+> ```
 
 ---
 
@@ -340,6 +322,62 @@ Live Preview shows the exact resolved data path for every field, including throu
 
 ---
 
+## 🗺️ Use Cases
+
+| Use Case | How It Helps |
+|---|---|
+| Dynamic landing pages | Editors compose pages from a library of blocks (hero, features, testimonials, CTA) without code changes |
+| Multi-tenant platforms | Each tenant gets its own block definitions without touching shared config or triggering redeployments |
+| Marketing teams | Full control to create, update, and reorder blocks on any page, any time |
+| Evolving content schemas | Roll out new block versions without breaking content built against older ones |
+| Headless frontends | Fetch structured block data from the Payload API and render with any framework |
+
+---
+
+## 📋 Compatibility
+
+| Requirement | Version |
+|---|---|
+| Payload CMS | v3.x |
+| Node.js | ≥ 18 |
+| Next.js | ≥ 14 |
+
+### Database Support
+
+| Database | Adapter |
+|---|---|
+| PostgreSQL / Supabase / Neon | `@payloadcms/db-postgres` |
+| SQLite / Turso / LibSQL | `@payloadcms/db-sqlite` |
+| MongoDB | `@payloadcms/db-mongodb` |
+
+---
+
+## 🔧 Advanced Usage
+
+### Using `dbLayoutField` Directly
+
+If you prefer not to use the plugin's `collections` option, you can add the layout tab manually to any collection:
+
+```ts
+import { dbLayoutField } from '@nextbridgehq/payload-block-builder'
+
+export const Pages: CollectionConfig = {
+  slug: 'pages',
+  fields: [
+    {
+      type: 'tabs',
+      tabs: [
+        { label: 'Content', fields: [/* your fields */] },
+        dbLayoutField(),                           // fieldName='dbLayout', tab label='DB Layout'
+        dbLayoutField('heroBlocks', 'Hero'),       // custom field name and tab label
+      ],
+    },
+  ],
+}
+```
+
+---
+
 ## 🏗️ Architecture
 
 ```
@@ -377,43 +415,6 @@ Key design decisions:
 
 ---
 
-## 🔧 Advanced Usage
-
-### Using `dbLayoutField` Directly
-
-If you prefer not to use the plugin's `collections` option, you can add the layout tab manually to any collection:
-
-```ts
-import { dbLayoutField } from '@nextbridgehq/payload-block-builder'
-
-export const Pages: CollectionConfig = {
-  slug: 'pages',
-  fields: [
-    {
-      type: 'tabs',
-      tabs: [
-        { label: 'Content', fields: [/* your fields */] },
-        dbLayoutField(),                           // fieldName='dbLayout', tab label='DB Layout'
-        dbLayoutField('heroBlocks', 'Hero'),       // custom field name and tab label
-      ],
-    },
-  ],
-}
-```
-
----
-
-## 🧪 Testing
-
-The package ships a Vitest suite covering schema normalization, validation, and code generation:
-
-```bash
-npm test          # run once
-npm run test:watch  # watch mode
-```
-
----
-
 ## 📦 CSS Imports Reference
 
 | Import path | Purpose |
@@ -424,15 +425,18 @@ npm run test:watch  # watch mode
 
 ---
 
-## 🗺️ Use Cases
+## 🧪 Testing
 
-| Use Case | How It Helps |
-|---|---|
-| Dynamic landing pages | Editors compose pages from a library of blocks (hero, features, testimonials, CTA) without code changes |
-| Multi-tenant platforms | Each tenant gets its own block definitions without touching shared config or triggering redeployments |
-| Marketing teams | Full control to create, update, and reorder blocks on any page, any time |
-| Evolving content schemas | Roll out new block versions without breaking content built against older ones |
-| Headless frontends | Fetch structured block data from the Payload API and render with any framework |
+The package ships a Vitest suite (114 tests, including a golden-file snapshot of generated code per field type) covering schema normalization, validation, and code generation:
+
+```bash
+npm test              # run once
+npm run test:watch    # watch mode
+npm run test:coverage # with coverage thresholds
+npm run check:encoding # scan for stray UTF-8 BOMs / mojibake
+```
+
+CI (`.github/workflows/ci.yml`) runs typecheck → test → build → encoding check on every push.
 
 ---
 
@@ -440,7 +444,7 @@ npm run test:watch  # watch mode
 
 See [CHANGELOG.md](./CHANGELOG.md) for the full history. Latest release:
 
-**0.2.0** — Live Preview, Layout fields (Row/Group/Array/Tabs/Collapsible), JSON Import/Export, version history & restore, concurrency-safe publishing, CSRF protection, and 8 bug fixes.
+**0.2.0** — Live Preview, Layout fields (Row/Group/Array/Tabs/Collapsible), JSON Import/Export, version history & restore, concurrency-safe publishing, CSRF protection, a 114-test suite with CI, and a large batch of correctness fixes (generated-code compilation, nested-field validation, breadcrumb navigation, and more — see CHANGELOG.md for the full list).
 
 ---
 
@@ -462,11 +466,4 @@ MIT © [Nextbridge](https://nextbridge.com)
 
 ---
 
-## 🔗 Links
-
-- [npm Package](https://www.npmjs.com/package/@nextbridgehq/payload-block-builder)
-- [GitHub Repository](https://github.com/nextbridgehq/block-builder)
-- [Report a Bug](https://github.com/nextbridgehq/block-builder/issues)
-- [Payload CMS](https://payloadcms.com)
-
-Built with ❤️ by Nextbridge
+Built and maintained by **[Nextbridge](https://nextbridge.com)** — If Payload Block Builder helped you ship content blocks without waiting on a developer, a ⭐ would mean a lot — it helps other developers discover Payload Block Builder.
